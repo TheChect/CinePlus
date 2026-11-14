@@ -410,3 +410,64 @@ a:hover {
   display: flex;
   gap: 12px;
 }
+
+/* =========================================================
+   Contacto
+   ========================================================= */
+/* Rejilla de 4 columnas para los datos de contacto */
+.rejilla-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* Dato principal de cada tarjeta (correo, teléfono...) */
+.dato {
+  font-size: 1.1rem;
+  margin: 6px 0 10px;
+}
+
+.chico {
+  font-size: 0.9rem;
+}
+
+/* Alinea arriba las dos columnas en lugar de al centro */
+.dos-columnas.arriba {
+  align-items: start;
+}
+
+/* Mapa dibujado con CSS: dos degradados repetidos simulan las calles */
+.mapa {
+  position: relative;
+  height: 300px;
+  margin: 16px 0;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background-color: var(--fondo);
+  background-image:
+    repeating-linear-gradient(0deg, var(--borde) 0 8px, transparent 8px 110px),
+    repeating-linear-gradient(90deg, var(--borde) 0 8px, transparent 8px 160px);
+}
+
+/* Punto azul que marca la ubicación */
+.mapa-punto {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 50% 50% 50% 0;
+  background-color: var(--azul);
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* Cada pregunta frecuente separada por una línea */
+.pregunta {
+  border-top: 1px solid var(--borde);
+  padding: 16px 0 4px;
+}
+
+.pregunta h4 {
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
