@@ -88,7 +88,8 @@ a:hover {
 }
 
 .seccion {
-  padding: 60px 0;
+  padding-top: 60px;
+  padding-bottom: 60px;
 }
 
 /* ---------- Botones ---------- */
@@ -136,4 +137,101 @@ a:hover {
   border: 1px solid var(--borde);
   border-radius: var(--radio);
   padding: 28px;
+}
+
+/* =========================================================
+   Encabezado (barra de navegación)
+   ========================================================= */
+.encabezado {
+  border-bottom: 1px solid var(--borde);
+  background-color: var(--fondo);
+}
+
+.encabezado-contenido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 72px;
+}
+
+/* Logo: cuadro azul + texto */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--texto);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.logo:hover {
+  text-decoration: none;
+}
+
+.logo-cuadro {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background-color: var(--azul);
+}
+
+.menu {
+  display: flex;
+  gap: 28px;
+  flex: 1;
+  margin-left: 20px;
+}
+
+.menu a,
+.menu-cuenta a:not(.btn) {
+  color: var(--texto);
+}
+
+/* Página actual en azul */
+.menu a.activo {
+  color: var(--azul-claro);
+}
+
+.menu-cuenta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* =========================================================
+   Pie de página
+   ========================================================= */
+.pie {
+  border-top: 1px solid var(--borde);
+  padding-top: 40px;
+  margin-top: 40px;
+}
+
+.pie-columnas {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 30px;
+}
+
+.pie h4 {
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+
+.pie-columnas a:not(.logo) {
+  display: block;
+  color: var(--texto-suave);
+  margin-bottom: 8px;
+}
+
+.pie-marca p {
+  margin-top: 14px;
+  max-width: 280px;
+}
+
+.pie-copy {
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  padding: 30px 0;
 }
