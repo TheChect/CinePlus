@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<!-- Cine+ · Tienda (catálogo de películas) -->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda · Cine+</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+<!-- Encabezado: es igual en todas las páginas; solo cambia el enlace con class="activo" -->
+<header class="encabezado">
+  <div class="contenedor encabezado-contenido">
+    <a class="logo" href="index.html">
+      <span class="logo-cuadro"></span> CINE+
+    </a>
+
+    <nav class="menu">
+      <a href="index.html">Inicio</a>
+      <a class="activo" href="tienda.html">Catálogo</a>
+      <a href="acerca.html">Acerca de nosotros</a>
+      <a href="contacto.html">Contacto</a>
+    </nav>
+
+    <div class="menu-cuenta">
+      <a href="login.html">Iniciar sesión</a>
+      <a class="btn btn-primario" href="registro.html">Suscribirse</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="seccion">
+  <div class="contenedor">
+
+    <!-- Título, buscador y botón del carrito -->
+    <div class="tienda-arriba">
+      <div>
+        <h1>Tienda de películas físicas</h1>
+        <p class="texto-suave">Colecciona el cine en la mejor calidad: 4K Ultra HD, Blu-ray y DVD.</p>
+      </div>
+      <div class="tienda-acciones">
+        <input class="campo" type="search" placeholder="Buscar título o director...">
+        <a class="btn btn-secundario" href="carrito.html">Carrito (3)</a>
+      </div>
+    </div>
+
+    <div class="tienda">
+
+      <!-- Filtros (por ahora solo diseño, no filtran) -->
+      <aside class="tarjeta filtros">
+        <h3>Filtros</h3>
+
+        <h5>Formato</h5>
+        <label><input type="checkbox" checked> 4K Ultra HD</label>
+        <label><input type="checkbox" checked> Blu-ray</label>
+        <label><input type="checkbox" checked> DVD</label>
+        <label><input type="checkbox"> Steelbook</label>
+
+        <h5>Género</h5>
+        <label><input type="checkbox"> Acción</label>
+        <label><input type="checkbox"> Ciencia ficción</label>
+        <label><input type="checkbox"> Clásicos</label>
+        <label><input type="checkbox"> Drama</label>
+        <label><input type="checkbox"> Terror</label>
+
+        <h5>Disponibilidad</h5>
+        <label><input type="radio" name="disponible" checked> En stock</label>
+        <label><input type="radio" name="disponible"> Preventa</label>
+
+        <button class="btn btn-secundario btn-bloque">Limpiar filtros</button>
+      </aside>
+
+      <!-- Tarjetas de películas (datos de ejemplo escritos a mano) -->
+      <div class="peliculas">
+
+      <div class="pelicula">
+        <div class="poster"><span class="formato f-4k">4K</span></div>
+        <div class="pelicula-info">
+          <h4>Oppenheimer</h4>
+          <p class="texto-suave chico">Christopher Nolan (2023)</p>
+          <div class="pelicula-precio">
+            <strong>$349.00</strong>
+            <span class="existencia ok">En stock</span>
+          </div>
+          <a class="btn btn-primario btn-bloque" href="carrito.html">Agregar al carrito</a>
+        </div>
+      </div>
+
+      <div class="pelicula">
+        <div class="poster"><span class="formato f-bluray">Blu-ray</span></div>
+        <div class="pelicula-info">
+          <h4>Blade Runner 2049</h4>
+          <p class="texto-suave chico">Denis Villeneuve (2017)</p>
+          <div class="pelicula-precio">
+            <strong>$219.00</strong>
+            <span class="existencia ok">En stock</span>
+          </div>
+          <a class="btn btn-primario btn-bloque" href="carrito.html">Agregar al carrito</a>
+        </div>
+      </div>
+
+      <div class="pelicula">
+        <div class="poster"><span class="formato f-especial">Steelbook</span></div>
+        <div class="pelicula-info">
+          <h4>Dune: Parte Dos</h4>
+          <p class="texto-suave chico">Denis Villeneuve (2024)</p>
+          <div class="pelicula-precio">
+            <strong>$459.00</strong>
+            <span class="existencia pocos">Preventa</span>
+          </div>
+          <a class="btn btn-primario btn-bloque" href="carrito.html">Agregar al carrito</a>
+        </div>
+      </div>
+
+      <div class="pelicula">
+        <div class="poster"><span class="formato f-4k">4K</span></div>
+        <div class="pelicula-info">
+          <h4>El Padrino</h4>
+          <p class="texto-suave chico">Francis Ford Coppola (1972)</p>
+          <div class="pelicula-precio">
+            <strong>$299.00</strong>
+            <span class="existencia ok">En stock</span>
+          </div>
+          <a class="btn btn-primario btn-bloque" href="carrito.html">Agregar al carrito</a>
+        </div>
+      </div>
+
+      <div class="pelicula">
+        <div class="poster"><span class="formato f-bluray">Blu-ray</span></div>
+        <div class="pelicula-info">
+          <h4>Pulp Fiction</h4>
+          <p class="texto-suave chico">Quentin Tarantino (1994)</p>
+          <div class="pelicula-precio">
+            <strong>$189.00</strong>
+            <span class="existencia pocos">Últimas 3</span>
+          </div>
+          <a class="btn btn-primario btn-bloque" href="carrito.html">Agregar al carrito</a>
+        </div>
+      </div>
+
+      <div class="pelicula">
+        <div class="poster"><span class="formato f-4k">4K</span></div>
+        <div class="pelicula-info">
+          <h4>Interestelar</h4>
+          <p class="texto-suave chico">Christopher Nolan (2014)</p>
+          <div class="pelicula-precio">
+            <strong>$329.00</strong>
+            <span class="existencia ok">En stock</span>
+          </div>
+          <a class="btn btn-primario btn-bloque" href="carrito.html">Agregar al carrito</a>
+        </div>
+      </div>
+
+      <div class="pelicula">
+        <div class="poster"><span class="formato f-dvd">DVD</span></div>
+        <div class="pelicula-info">
+          <h4>Cinema Paradiso</h4>
+          <p class="texto-suave chico">Giuseppe Tornatore (1988)</p>
+          <div class="pelicula-precio">
+            <strong>$99.00</strong>
+            <span class="existencia ok">En stock</span>
+          </div>
+          <a class="btn btn-primario btn-bloque" href="carrito.html">Agregar al carrito</a>
+        </div>
+      </div>
+
+      <div class="pelicula">
+        <div class="poster"><span class="formato f-4k">4K</span></div>
+        <div class="pelicula-info">
+          <h4>Matrix</h4>
+          <p class="texto-suave chico">Lana y Lilly Wachowski (1999)</p>
+          <div class="pelicula-precio">
+            <strong>$279.00</strong>
+            <span class="existencia agotado">Agotado</span>
+          </div>
+          <button class="btn btn-primario btn-bloque" disabled>Agotado</button>
+        </div>
+      </div>
+
+      </div>
+    </div>
+
+    <!-- Paginación (solo diseño) -->
+    <div class="paginacion">
+      <a class="activo" href="#">1</a>
+      <a href="#">2</a>
+      <a href="#">3</a>
+      <span>…</span>
+      <a href="#">12</a>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<!-- Pie de página -->
+<footer class="pie">
+  <div class="contenedor pie-columnas">
+    <div class="pie-marca">
+      <a class="logo" href="index.html"><span class="logo-cuadro"></span> CINE+</a>
+      <p class="texto-suave">La tienda de cine físico para coleccionistas exigentes.</p>
+    </div>
+
+    <div>
+      <h4>Navegación</h4>
+      <a href="index.html">Inicio</a>
+      <a href="tienda.html">Catálogo</a>
+      <a href="acerca.html">Acerca de nosotros</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+
+    <div>
+      <h4>Mi cuenta</h4>
+      <a href="login.html">Iniciar sesión</a>
+      <a href="registro.html">Crear cuenta</a>
+      <a href="carrito.html">Carrito</a>
+      <a href="perfil.html">Mi perfil</a>
+    </div>
+
+    <div>
+      <h4>Soporte</h4>
+      <a href="contacto.html">Preguntas frecuentes</a>
+      <a href="contacto.html">Envíos y entregas</a>
+      <a href="contacto.html">Política de devolución</a>
+    </div>
+  </div>
+
+  <div class="contenedor">
+    <p class="pie-copy">© 2026 Cine+. Proyecto académico FIME · UANL. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+</body>
+</html>
