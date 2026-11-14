@@ -1,0 +1,139 @@
+/* =========================================================
+   Cine+ · Estilos base
+   Colores, fuente y botones que usan todas las páginas.
+   Basado en las pantallas de Figma (tema oscuro).
+   ========================================================= */
+
+/* Fuente Nunito desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+/* ---------- Colores (variables) ---------- */
+:root {
+  --fondo: #0b1222;          /* fondo general de la página */
+  --fondo-tarjeta: #111a2e;  /* fondo de tarjetas y secciones */
+  --borde: #1f2a40;          /* líneas y bordes */
+  --texto: #e6ebf5;          /* texto principal */
+  --texto-suave: #94a3b8;    /* texto secundario o descripciones */
+  --azul: #2f6bff;           /* color principal (botones) */
+  --azul-hover: #1f56e0;     /* botón al pasar el mouse */
+  --azul-claro: #5b9cf5;     /* enlaces y números destacados */
+  --azul-banner: #1e3a7b;    /* fondo de los avisos grandes */
+  --radio: 10px;             /* esquinas redondeadas */
+}
+
+/* ---------- Reset sencillo ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', Arial, sans-serif;
+  background-color: var(--fondo);
+  color: var(--texto);
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ---------- Textos ---------- */
+h1, h2, h3, h4 {
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+h1 { font-size: 2.6rem; }
+h2 { font-size: 1.9rem; }
+h3 { font-size: 1.3rem; }
+
+p {
+  margin-bottom: 12px;
+}
+
+a {
+  color: var(--azul-claro);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.texto-suave {
+  color: var(--texto-suave);
+}
+
+/* Etiqueta pequeña en mayúsculas arriba de los títulos */
+.etiqueta {
+  display: inline-block;
+  color: var(--azul-claro);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+/* ---------- Contenedor centrado ---------- */
+.contenedor {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.seccion {
+  padding: 60px 0;
+}
+
+/* ---------- Botones ---------- */
+.btn {
+  display: inline-block;
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s;
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+/* Botón azul (acción principal) */
+.btn-primario {
+  background-color: var(--azul);
+  color: #fff;
+}
+
+.btn-primario:hover {
+  background-color: var(--azul-hover);
+}
+
+/* Botón oscuro con borde (acción secundaria) */
+.btn-secundario {
+  background-color: var(--fondo-tarjeta);
+  color: var(--texto);
+  border-color: var(--borde);
+}
+
+.btn-secundario:hover {
+  background-color: var(--borde);
+}
+
+/* ---------- Tarjeta genérica ---------- */
+.tarjeta {
+  background-color: var(--fondo-tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 28px;
+}
