@@ -317,3 +317,96 @@ a:hover {
   color: var(--azul-claro);
   font-weight: 700;
 }
+
+/* =========================================================
+   Acerca de nosotros
+   ========================================================= */
+/* Dos columnas: texto e imagen */
+.dos-columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: center;
+}
+
+/* Recuadro gris donde irá una foto */
+.imagen-vacia {
+  height: 300px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background-color: var(--fondo-tarjeta);
+  color: var(--texto-suave);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+/* Fila de números grandes */
+.cifras {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.cifras strong {
+  display: block;
+  font-size: 2.4rem;
+  color: var(--azul-claro);
+}
+
+.cifras span {
+  color: var(--texto-suave);
+}
+
+/* Tarjetas del equipo (6 en una fila) */
+.equipo {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.integrante {
+  text-align: center;
+  padding: 20px 10px;
+}
+
+.integrante h4 {
+  font-size: 0.95rem;
+  margin: 12px 0 4px;
+}
+
+.integrante span {
+  font-size: 0.85rem;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #334155;
+  margin: 0 auto;
+}
+
+/* Recuadro azul con invitación y botones */
+.aviso {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  background-color: var(--azul-banner);
+  border-radius: 16px;
+  padding: 36px 50px;
+  margin: 20px 0 40px;
+}
+
+.aviso p {
+  margin: 0;
+}
+
+.aviso-botones {
+  display: flex;
+  gap: 12px;
+}

@@ -1,0 +1,100 @@
+<?php
+// Cine+ · Página "Acerca de nosotros"
+$titulo = 'Acerca de nosotros';
+$pagina = 'acerca';
+include 'includes/encabezado.php';
+?>
+
+<!-- Título de la página -->
+<section class="portada">
+  <div class="contenedor">
+    <span class="etiqueta">Nuestra historia</span>
+    <h1>Acerca de Cine+</h1>
+    <p class="texto-suave">
+      Somos una tienda en línea para quienes todavía disfrutan tener sus películas en las manos:
+      con portada, caja y la mejor calidad de imagen.
+    </p>
+  </div>
+</section>
+
+<!-- Historia: texto a la izquierda e imagen a la derecha -->
+<section class="seccion">
+  <div class="contenedor dos-columnas">
+    <div>
+      <h2>Cómo nació Cine+</h2>
+      <p class="texto-suave">
+        Cine+ surgió como proyecto de un grupo de estudiantes de FIME que notó algo: los catálogos de
+        streaming cambian cada mes y muchas películas desaparecen sin aviso. Quien quiere conservar una
+        película, tiene que tenerla en formato físico.
+      </p>
+      <p class="texto-suave">
+        Por eso reunimos en un solo lugar títulos en DVD, Blu-ray y 4K Ultra HD, con información clara
+        de cada edición, existencias reales y envío a domicilio.
+      </p>
+    </div>
+    <!-- Espacio para la foto (la imagen real se agrega después) -->
+    <div class="imagen-vacia">Foto del equipo / tienda</div>
+  </div>
+</section>
+
+<!-- Misión, visión y valores -->
+<section class="seccion">
+  <div class="contenedor rejilla-3">
+    <div class="tarjeta">
+      <div class="icono"></div>
+      <h3>Misión</h3>
+      <p class="texto-suave">Acercar el cine en formato físico a coleccionistas y aficionados con un catálogo confiable, precios claros y una compra sencilla.</p>
+    </div>
+    <div class="tarjeta">
+      <div class="icono"></div>
+      <h3>Visión</h3>
+      <p class="texto-suave">Ser la tienda en línea de referencia en México para quienes prefieren tener sus películas en DVD, Blu-ray y 4K.</p>
+    </div>
+    <div class="tarjeta">
+      <div class="icono"></div>
+      <h3>Valores</h3>
+      <p class="texto-suave">Pasión por el cine, honestidad en existencias y precios, atención cercana y cuidado en cada envío.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Números de la tienda -->
+<section class="seccion seccion-oscura">
+  <div class="contenedor cifras">
+    <div><strong>3</strong><span>formatos físicos</span></div>
+    <div><strong>+500</strong><span>títulos en catálogo</span></div>
+    <div><strong>32</strong><span>estados con envío</span></div>
+    <div><strong>30 días</strong><span>para devoluciones</span></div>
+  </div>
+</section>
+
+<!-- Integrantes del equipo -->
+<section class="seccion">
+  <div class="contenedor">
+    <h2>Nuestro equipo</h2>
+    <div class="equipo">
+      <div class="tarjeta integrante"><div class="avatar"></div><h4>Josué Delgado</h4><span class="texto-suave">Integrante</span></div>
+      <div class="tarjeta integrante"><div class="avatar"></div><h4>Luis Santiago</h4><span class="texto-suave">Integrante</span></div>
+      <div class="tarjeta integrante"><div class="avatar"></div><h4>Alejandro De la Madrid</h4><span class="texto-suave">Integrante</span></div>
+      <div class="tarjeta integrante"><div class="avatar"></div><h4>Diego Silva</h4><span class="texto-suave">Integrante</span></div>
+      <div class="tarjeta integrante"><div class="avatar"></div><h4>Jorge Rodríguez</h4><span class="texto-suave">Integrante</span></div>
+      <div class="tarjeta integrante"><div class="avatar"></div><h4>Esteban Vargas</h4><span class="texto-suave">Integrante</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Invitación final -->
+<section class="contenedor">
+  <div class="aviso">
+    <div>
+      <h3>¿Listo para armar tu colección?</h3>
+      <p>Explora el catálogo y encuentra tu próxima película favorita.</p>
+    </div>
+    <div class="aviso-botones">
+      <a class="btn btn-secundario" href="contacto.php">Contáctanos</a>
+      <a class="btn btn-primario" href="tienda.php">Ver catálogo</a>
+    </div>
+  </div>
+</section>
+
+<?php include 'includes/pie.php'; ?>
