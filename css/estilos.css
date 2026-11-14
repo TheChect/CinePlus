@@ -235,3 +235,85 @@ a:hover {
   font-size: 0.85rem;
   padding: 30px 0;
 }
+
+/* =========================================================
+   Clases de apoyo
+   ========================================================= */
+.centrado {
+  text-align: center;
+}
+
+/* Sección con fondo un poco más claro */
+.seccion-oscura {
+  background-color: var(--fondo-tarjeta);
+}
+
+/* Rejilla de 3 columnas para tarjetas */
+.rejilla-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* Cuadro de color que va arriba de cada tarjeta */
+.icono {
+  width: 42px;
+  height: 42px;
+  border-radius: 9px;
+  background-color: var(--azul-banner);
+  margin-bottom: 16px;
+}
+
+/* =========================================================
+   Inicio
+   ========================================================= */
+.portada {
+  text-align: center;
+  padding: 90px 0 40px;
+}
+
+.portada p {
+  max-width: 640px;
+  margin: 0 auto 28px;
+  font-size: 1.1rem;
+}
+
+.portada-botones {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* =========================================================
+   Tablas
+   ========================================================= */
+.tabla-scroll {
+  overflow-x: auto;   /* en pantallas chicas se desliza de lado */
+  margin-top: 30px;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th,
+.tabla td {
+  text-align: left;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.tabla th {
+  font-weight: 700;
+}
+
+.tabla td {
+  color: var(--texto-suave);
+}
+
+/* Columna 4K resaltada */
+.tabla .destacado {
+  color: var(--azul-claro);
+  font-weight: 700;
+}
