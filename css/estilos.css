@@ -650,3 +650,64 @@ a:hover {
   padding: 8px 10px;
   font-size: 0.9rem;
 }
+
+/* =========================================================
+   Iniciar sesión y Crear cuenta
+   ========================================================= */
+/* Caja angosta y centrada para los formularios */
+.caja-formulario {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.caja-formulario h2 {
+  margin: 8px 0 4px;
+}
+
+/* Cada etiqueta arriba de su campo */
+.caja-formulario label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 16px 0 6px;
+}
+
+.caja-formulario .btn-primario {
+  margin-top: 20px;
+}
+
+.olvide {
+  display: block;
+  text-align: right;
+  margin-top: 8px;
+}
+
+/* Casilla de términos en una sola línea con su texto */
+.caja-formulario .casilla {
+  font-weight: 400;
+  color: var(--texto-suave);
+}
+
+/* Línea con la "o" en medio */
+.separador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+}
+
+.separador::before,
+.separador::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--borde);
+}
+
+.cambio {
+  text-align: center;
+  margin: 18px 0 0;
+  color: var(--texto-suave);
+}
