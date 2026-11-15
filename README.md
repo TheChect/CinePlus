@@ -10,6 +10,4 @@ Proyecto Integrador de Aprendizaje (PIA) de Programación Web · FIME UANL · Gr
 - PHP
 - MySQL (XAMPP)
 
-## Estado
 
-En desarrollo. La página se construye poco a poco; cada avance queda registrado en el historial de commits.
