@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<!-- Cine+ · Gestión de usuarios (solo diseño, con datos de ejemplo) -->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de usuarios · Cine+</title>
+  <link rel="stylesheet" href="../css/estilos.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+<div class="admin">
+
+  <!-- Barra lateral con el menú de administración -->
+  <aside class="lateral">
+    <a class="logo" href="panel.html"><span class="logo-cuadro"></span> CINE+</a>
+
+    <p class="lateral-titulo">Principal</p>
+    <nav class="lateral-menu">
+      <a href="panel.html">Dashboard</a>
+      <a class="activo" href="usuarios.html">Gestión de Usuarios</a>
+      <a href="peliculas.html">Gestión de Películas</a>
+      <a href="generos.html">Gestión de Géneros</a>
+      <a href="formatos.html">Gestión de Formatos</a>
+    </nav>
+
+    <!-- Parte de abajo: cerrar sesión y datos del administrador -->
+    <div class="lateral-abajo">
+      <a href="acceso.html">&larr; Cerrar sesión</a>
+      <div class="admin-usuario">
+        <div class="avatar avatar-chico"></div>
+        <div>
+          <strong>Admin Central</strong>
+          <span class="texto-suave chico">admin@cineplus.com</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Lado derecho: barra superior y contenido -->
+  <div class="admin-derecha">
+    <header class="admin-barra">
+      <input class="campo buscador" type="search" placeholder="Buscar en el panel...">
+      <div class="avatar avatar-chico"></div>
+    </header>
+
+    <main class="admin-contenido">
+      <div class="admin-titulo">
+        <div>
+          <h1>Gestión de usuarios</h1>
+          <p class="texto-suave">Administra las cuentas, roles y el acceso a la plataforma.</p>
+        </div>
+        <a class="btn btn-primario" href="usuario_form.html">+ Añadir usuario</a>
+      </div>
+
+      <div class="tarjeta barra-busqueda filtros-admin">
+        <input class="campo" type="search" placeholder="Buscar por nombre o correo...">
+        <label>Rol
+          <select class="campo"><option>Todos los roles</option><option>Cliente</option><option>Administrador</option></select>
+        </label>
+        <label>Estado
+          <select class="campo"><option>Cualquier estado</option><option>Activo</option><option>Suspendido</option></select>
+        </label>
+      </div>
+
+      <div class="tarjeta sin-relleno">
+        <table class="tabla tabla-admin tabla-lista">
+          <thead>
+            <tr><th>Usuario</th><th>Rol</th><th>Estado</th><th>Registro</th><th>Pedidos</th><th>Acciones</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="celda-pelicula">
+                  <div class="iniciales">AG</div>
+                  <div><strong>Alejandro González</strong><span class="texto-suave chico">alejandro@correo.com</span></div>
+                </div>
+              </td>
+              <td><span class="insignia gris">Cliente</span></td>
+              <td><span class="insignia verde">● Activo</span></td>
+              <td>12 oct 2025</td>
+              <td>8</td>
+              <td class="acciones">
+                <a class="accion ver" href="usuario_form.html">Ver</a>
+                <a class="accion editar" href="usuario_form.html">Editar</a>
+                <a class="accion eliminar" href="#eliminar">Eliminar</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="celda-pelicula">
+                  <div class="iniciales">MS</div>
+                  <div><strong>Mariana Silva</strong><span class="texto-suave chico">mariana.silva@correo.com</span></div>
+                </div>
+              </td>
+              <td><span class="insignia gris">Cliente</span></td>
+              <td><span class="insignia verde">● Activo</span></td>
+              <td>5 nov 2025</td>
+              <td>3</td>
+              <td class="acciones">
+                <a class="accion ver" href="usuario_form.html">Ver</a>
+                <a class="accion editar" href="usuario_form.html">Editar</a>
+                <a class="accion eliminar" href="#eliminar">Eliminar</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="celda-pelicula">
+                  <div class="iniciales">RM</div>
+                  <div><strong>Roberto Méndez</strong><span class="texto-suave chico">roberto.m@correo.com</span></div>
+                </div>
+              </td>
+              <td><span class="insignia azul">Administrador</span></td>
+              <td><span class="insignia verde">● Activo</span></td>
+              <td>20 nov 2025</td>
+              <td>0</td>
+              <td class="acciones">
+                <a class="accion ver" href="usuario_form.html">Ver</a>
+                <a class="accion editar" href="usuario_form.html">Editar</a>
+                <a class="accion eliminar" href="#eliminar">Eliminar</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="celda-pelicula">
+                  <div class="iniciales">LT</div>
+                  <div><strong>Lucía Torres</strong><span class="texto-suave chico">lucia.torres@correo.com</span></div>
+                </div>
+              </td>
+              <td><span class="insignia gris">Cliente</span></td>
+              <td><span class="insignia amarilla">● Suspendido</span></td>
+              <td>2 ene 2026</td>
+              <td>1</td>
+              <td class="acciones">
+                <a class="accion ver" href="usuario_form.html">Ver</a>
+                <a class="accion editar" href="usuario_form.html">Editar</a>
+                <a class="accion eliminar" href="#eliminar">Eliminar</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="celda-pelicula">
+                  <div class="iniciales">CR</div>
+                  <div><strong>Carlos Rodríguez</strong><span class="texto-suave chico">carlos.rodriguez@correo.com</span></div>
+                </div>
+              </td>
+              <td><span class="insignia gris">Cliente</span></td>
+              <td><span class="insignia verde">● Activo</span></td>
+              <td>14 dic 2025</td>
+              <td>5</td>
+              <td class="acciones">
+                <a class="accion ver" href="usuario_form.html">Ver</a>
+                <a class="accion editar" href="usuario_form.html">Editar</a>
+                <a class="accion eliminar" href="#eliminar">Eliminar</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pie-tabla">
+        <p class="texto-suave chico">Mostrando 1 a 5 de 312 usuarios</p>
+        <div class="paginacion">
+          <a href="#">Anterior</a>
+          <a class="activo" href="#">1</a>
+          <a href="#">2</a>
+          <a href="#">3</a>
+          <a href="#">Siguiente</a>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal" id="eliminar">
+      <div class="tarjeta modal-caja">
+        <div class="icono-alerta">!</div>
+        <h2>¿Eliminar este usuario?</h2>
+        <p class="texto-suave">Esta acción no se puede deshacer. Se eliminará el registro de la tabla Usuario.</p>
+        <div class="registro-borrar">
+          <strong>Lucía Torres</strong>
+          <span class="texto-suave chico">lucia.torres@correo.com · Cliente · 1 pedido</span>
+        </div>
+        <p class="alerta-amarilla chico">Sus pedidos se conservan para las estadísticas, pero quedan sin usuario asignado. Si solo quieres bloquear el acceso, mejor suspende la cuenta.</p>
+        <div class="modal-botones">
+          <a class="btn btn-secundario" href="#">Cancelar</a>
+          <a class="btn btn-rojo" href="#">Sí, eliminar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

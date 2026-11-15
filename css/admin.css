@@ -455,3 +455,248 @@ textarea.campo {
   padding: 12px 16px;
   margin: 0;
 }
+
+/* =========================================================
+   Gestión de películas y usuarios
+   ========================================================= */
+/* Buscador con filtros en una sola fila */
+.filtros-admin {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.filtros-admin > .campo {
+  flex: 1;
+}
+
+.filtros-admin label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+.filtros-admin select {
+  width: 150px;
+}
+
+/* Celda con imagen (o iniciales) y dos líneas de texto */
+.celda-pelicula {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.celda-pelicula span {
+  display: block;
+}
+
+.mini-tabla {
+  width: 44px;
+  height: 60px;
+}
+
+/* Círculo con las iniciales del usuario */
+.iniciales {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--azul-banner);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.acciones {
+  white-space: nowrap;
+}
+
+.accion.ver {
+  background-color: var(--borde);
+  color: var(--texto);
+}
+
+.insignia.verde {
+  background-color: #052e1c;
+  color: #4ade80;
+}
+
+.amarillo-texto {
+  color: #fbbf24;
+}
+
+/* Texto y paginación debajo de la tabla */
+.pie-tabla {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.pie-tabla .paginacion {
+  margin: 0;
+}
+
+.resumen-inventario {
+  margin-top: 24px;
+}
+
+/* ---------- Formularios de Nueva película / Añadir usuario ---------- */
+.sin-margen {
+  margin: 0;
+}
+
+/* Columna angosta (portada/foto) y columna ancha (datos) */
+.formulario-admin {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.formulario-admin label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 14px 0 6px;
+}
+
+.formulario-admin .btn {
+  margin-top: 16px;
+}
+
+.subtitulo-form {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--borde);
+  margin-top: 10px;
+}
+
+.campos-admin .subtitulo-form + .dos-campos,
+.campos-admin .subtitulo-form + .tres-campos {
+  margin-top: -6px;
+}
+
+.tres-campos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* Recuadro punteado para subir la portada */
+.subir-imagen {
+  height: 360px;
+  border: 2px dashed var(--borde);
+  border-radius: var(--radio);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.circulo-subir {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--azul-banner);
+  color: #fff;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+/* Círculo punteado para la foto de perfil */
+.foto-vacia {
+  width: 140px;
+  height: 140px;
+  margin: 14px auto;
+  border: 2px dashed var(--borde);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+/* Opciones tipo píldora: el radio se oculta y se pinta la etiqueta */
+.pildoras {
+  display: flex;
+  gap: 10px;
+}
+
+.formulario-admin .pildora {
+  display: inline-block;
+  margin: 0;
+  padding: 8px 18px;
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pildora input {
+  display: none;
+}
+
+/* :has() pinta la píldora cuando su radio está seleccionado */
+.pildora:has(input:checked) {
+  background-color: var(--azul-banner);
+  border-color: var(--azul);
+}
+
+.nota-form {
+  margin-top: 20px;
+}
+
+/* Tablas de Películas y Usuarios: más compactas para que quepan */
+.admin-derecha {
+  min-width: 0;   /* evita que una tabla ancha empuje la página de lado */
+}
+
+.tabla-lista th,
+.tabla-lista td {
+  padding: 12px 14px;
+}
+
+.tabla-lista td:first-child {
+  font-weight: 400;
+}
+
+.tabla-lista td {
+  white-space: nowrap;   /* fechas, precios y botones en una sola línea */
+}
+
+.tabla-lista td:first-child {
+  white-space: normal;
+  min-width: 220px;
+}
+
+.insignia {
+  white-space: nowrap;
+}
+
+.filtros-admin > .campo {
+  min-width: 0;
+}
+
+.filtros-admin select {
+  width: 140px;
+}
+
+/* Existencia baja en amarillo dentro de la tabla */
+.tabla-lista .amarillo-texto {
+  color: #fbbf24;
+}
+
+.filtros-admin select {
+  width: 165px;
+}

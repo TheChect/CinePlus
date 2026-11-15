@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!-- Cine+ · Nueva película (solo diseño, con datos de ejemplo) -->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nueva película · Cine+</title>
+  <link rel="stylesheet" href="../css/estilos.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+<div class="admin">
+
+  <!-- Barra lateral con el menú de administración -->
+  <aside class="lateral">
+    <a class="logo" href="panel.html"><span class="logo-cuadro"></span> CINE+</a>
+
+    <p class="lateral-titulo">Principal</p>
+    <nav class="lateral-menu">
+      <a href="panel.html">Dashboard</a>
+      <a href="usuarios.html">Gestión de Usuarios</a>
+      <a class="activo" href="peliculas.html">Gestión de Películas</a>
+      <a href="generos.html">Gestión de Géneros</a>
+      <a href="formatos.html">Gestión de Formatos</a>
+    </nav>
+
+    <!-- Parte de abajo: cerrar sesión y datos del administrador -->
+    <div class="lateral-abajo">
+      <a href="acceso.html">&larr; Cerrar sesión</a>
+      <div class="admin-usuario">
+        <div class="avatar avatar-chico"></div>
+        <div>
+          <strong>Admin Central</strong>
+          <span class="texto-suave chico">admin@cineplus.com</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Lado derecho: barra superior y contenido -->
+  <div class="admin-derecha">
+    <header class="admin-barra">
+      <input class="campo buscador" type="search" placeholder="Buscar en el panel...">
+      <div class="avatar avatar-chico"></div>
+    </header>
+
+    <main class="admin-contenido">
+      <p class="ruta chico"><a href="peliculas.html">Gestión de Películas</a> / <span>Nueva película</span></p>
+      <div class="admin-titulo">
+        <div>
+          <h1>Nueva película</h1>
+          <p class="texto-suave">Registra un nuevo título en el catálogo de Cine+. Este mismo formulario sirve para editar.</p>
+        </div>
+        <div class="modal-botones sin-margen">
+          <a class="btn btn-secundario" href="peliculas.html">Cancelar</a>
+          <a class="btn btn-primario" href="peliculas.html">Guardar película</a>
+        </div>
+      </div>
+
+      <!-- Formulario en dos columnas: portada a la izquierda y datos a la derecha -->
+      <form class="formulario-admin" action="#">
+
+        <div class="tarjeta">
+          <h3>Portada</h3>
+          <div class="subir-imagen">
+            <div class="circulo-subir">&uarr;</div>
+            <strong>Arrastra una imagen aquí</strong>
+            <span class="texto-suave chico">JPG o PNG, máx. 2 MB</span>
+          </div>
+          <!-- input type="file" oculto dentro de un label que parece botón -->
+          <label class="btn btn-secundario btn-bloque">Seleccionar archivo <input type="file" accept="image/*" hidden></label>
+        </div>
+
+        <div class="tarjeta campos-admin">
+          <h3 class="subtitulo-form">Información general</h3>
+          <div class="dos-campos">
+            <div><label for="titulo">Título *</label><input class="campo" id="titulo" placeholder="Ej. El Padrino"></div>
+            <div><label for="director">Director *</label><input class="campo" id="director" placeholder="Ej. Francis Ford Coppola"></div>
+          </div>
+          <div class="tres-campos">
+            <div><label for="anio">Año de estreno</label><input class="campo" id="anio" type="number" placeholder="AAAA"></div>
+            <div><label for="genero">Género *</label>
+              <select class="campo" id="genero">
+                <option>Selecciona un género</option><option>Acción</option><option>Aventura</option>
+                <option>Ciencia ficción</option><option>Comedia</option><option>Drama</option><option>Terror</option><option>Thriller</option>
+              </select>
+            </div>
+            <div><label for="calificacion">Calificación</label><input class="campo" id="calificacion" type="number" step="0.1" min="0" max="10" placeholder="0.0 a 10.0"></div>
+          </div>
+          <label for="sinopsis">Sinopsis</label>
+          <textarea class="campo" id="sinopsis" rows="3" placeholder="Describe brevemente la película..."></textarea>
+
+          <h3 class="subtitulo-form">Venta e inventario</h3>
+          <div class="dos-campos">
+            <div>
+              <label>Formato</label>
+              <!-- Botones tipo "píldora": son radios con estilo -->
+              <div class="pildoras">
+                <label class="pildora"><input type="radio" name="formato"> DVD</label>
+                <label class="pildora"><input type="radio" name="formato" checked> Blu-ray</label>
+                <label class="pildora"><input type="radio" name="formato"> 4K Ultra HD</label>
+              </div>
+            </div>
+            <div>
+              <label>Estado de publicación</label>
+              <div class="pildoras">
+                <label class="pildora"><input type="radio" name="estado"> Publicado</label>
+                <label class="pildora"><input type="radio" name="estado" checked> Borrador</label>
+              </div>
+            </div>
+          </div>
+          <div class="dos-campos">
+            <div><label for="precio">Precio (MXN) *</label><input class="campo" id="precio" type="number" step="0.01" min="0" placeholder="$0.00"></div>
+            <div>
+              <label for="existencia">Existencia *</label><input class="campo" id="existencia" type="number" min="0" placeholder="0">
+              <span class="texto-suave chico">Unidades disponibles en almacén</span>
+            </div>
+          </div>
+          <p class="texto-suave chico nota-form">Los campos con * son obligatorios. Al guardar, la película se registra en la base de datos y aparece en el catálogo si su estado es Publicado.</p>
+        </div>
+
+      </form>
+    </main>
+  </div>
+
+</div>
+
+</body>
+</html>
