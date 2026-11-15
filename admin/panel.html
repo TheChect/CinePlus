@@ -48,11 +48,122 @@
     </header>
 
     <main class="admin-contenido">
-      <h1>Panel administrativo</h1>
-      <p class="texto-suave">Resumen de ventas e inventario.</p>
+      <!-- Título y selector de periodo -->
+      <div class="admin-titulo">
+        <div>
+          <h1>Panel administrativo</h1>
+          <p class="texto-suave">Resumen de ventas e inventario · Octubre 2026</p>
+        </div>
+        <select class="campo periodo">
+          <option>Este mes</option>
+          <option>Mes pasado</option>
+          <option>Este año</option>
+        </select>
+      </div>
 
-      <!-- Aquí irá el contenido del panel (siguiente paso) -->
-      <div class="tarjeta espacio-vacio texto-suave">Contenido del panel</div>
+      <!-- Tarjetas con los números principales (datos de ejemplo) -->
+      <div class="rejilla-4">
+        <div class="tarjeta indicador">
+          <span class="texto-suave">Ingresos del mes</span>
+          <strong>$24,580</strong>
+          <span class="chico"><b class="verde">+ 12%</b> <span class="texto-suave">vs. septiembre</span></span>
+        </div>
+        <div class="tarjeta indicador">
+          <span class="texto-suave">Pedidos del mes</span>
+          <strong>58</strong>
+          <span class="chico"><b class="verde">+ 8</b> <span class="texto-suave">más que septiembre</span></span>
+        </div>
+        <div class="tarjeta indicador">
+          <span class="texto-suave">Clientes registrados</span>
+          <strong>312</strong>
+          <span class="chico"><b class="verde">+18</b> <span class="texto-suave">nuevos este mes</span></span>
+        </div>
+        <div class="tarjeta indicador">
+          <span class="texto-suave">Películas publicadas</span>
+          <strong>126</strong>
+          <span class="texto-suave chico">de 140 registradas</span>
+        </div>
+      </div>
+
+      <!-- Gráfica de barras y top 5 -->
+      <div class="panel-fila">
+
+        <div class="tarjeta">
+          <div class="tarjeta-titulo">
+            <h3>Ingresos por mes</h3>
+            <span class="texto-suave chico">Últimos 6 meses · MXN</span>
+          </div>
+          <!-- Cada barra usa height en % para su altura -->
+          <div class="grafica">
+            <div class="barra-col"><span>$14.2k</span><div class="barra" style="height: 49%;"></div><small>May</small></div>
+            <div class="barra-col"><span>$16.8k</span><div class="barra" style="height: 58%;"></div><small>Jun</small></div>
+            <div class="barra-col"><span>$15.1k</span><div class="barra" style="height: 52%;"></div><small>Jul</small></div>
+            <div class="barra-col"><span>$19.4k</span><div class="barra" style="height: 67%;"></div><small>Ago</small></div>
+            <div class="barra-col"><span>$21.9k</span><div class="barra" style="height: 76%;"></div><small>Sep</small></div>
+            <div class="barra-col"><span>$24.6k</span><div class="barra barra-actual" style="height: 85%;"></div><small>Oct</small></div>
+          </div>
+        </div>
+
+        <div class="tarjeta">
+          <div class="tarjeta-titulo">
+            <h3>Top 5 películas más vendidas</h3>
+            <span class="texto-suave chico">Este mes</span>
+          </div>
+          <!-- El ancho del relleno representa las unidades vendidas -->
+          <div class="top">
+            <div class="top-fila"><span>1. Oppenheimer · 4K</span><strong>21 uds.</strong></div>
+            <div class="progreso"><div style="width: 100%;"></div></div>
+            <div class="top-fila"><span>2. Dune: Parte Dos · Blu-ray</span><strong>17 uds.</strong></div>
+            <div class="progreso"><div style="width: 81%;"></div></div>
+            <div class="top-fila"><span>3. El origen · Blu-ray</span><strong>12 uds.</strong></div>
+            <div class="progreso"><div style="width: 57%;"></div></div>
+            <div class="top-fila"><span>4. Batman: El caballero de la noche · 4K</span><strong>9 uds.</strong></div>
+            <div class="progreso"><div style="width: 43%;"></div></div>
+            <div class="top-fila"><span>5. Interestelar · Blu-ray</span><strong>7 uds.</strong></div>
+            <div class="progreso"><div style="width: 33%;"></div></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Poca existencia y ventas por formato -->
+      <div class="panel-fila">
+
+        <div class="tarjeta sin-relleno">
+          <div class="tarjeta-titulo con-relleno">
+            <h3>Películas con poca existencia</h3>
+            <span class="texto-suave chico">5 unidades o menos</span>
+          </div>
+          <table class="tabla tabla-admin">
+            <thead>
+              <tr><th>Película</th><th>Formato</th><th>Existencia</th><th>Acción</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Parásitos</td><td>DVD</td><td><span class="insignia roja">Agotada</span></td><td><a href="peliculas.html">Editar</a></td></tr>
+              <tr><td>Dune: Parte Dos</td><td>Blu-ray</td><td><span class="insignia amarilla">3 uds.</span></td><td><a href="peliculas.html">Editar</a></td></tr>
+              <tr><td>El Padrino</td><td>Blu-ray</td><td><span class="insignia amarilla">4 uds.</span></td><td><a href="peliculas.html">Editar</a></td></tr>
+              <tr><td>Pulp Fiction</td><td>DVD</td><td><span class="insignia amarilla">5 uds.</span></td><td><a href="peliculas.html">Editar</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tarjeta">
+          <div class="tarjeta-titulo">
+            <h3>Ventas por formato</h3>
+            <span class="texto-suave chico">% de unidades del mes</span>
+          </div>
+          <!-- Una sola barra dividida en tres partes -->
+          <div class="barra-formatos">
+            <div class="f-4k" style="width: 38%;"></div>
+            <div class="claro" style="width: 45%;"></div>
+            <div class="f-dvd" style="width: 17%;"></div>
+          </div>
+          <div class="leyenda"><span><i class="f-4k"></i> 4K Ultra HD</span><strong>38%</strong></div>
+          <div class="leyenda"><span><i class="claro"></i> Blu-ray</span><strong>45%</strong></div>
+          <div class="leyenda"><span><i class="f-dvd"></i> DVD</span><strong>17%</strong></div>
+        </div>
+
+      </div>
     </main>
   </div>
 

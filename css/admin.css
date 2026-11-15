@@ -142,3 +142,177 @@
   align-items: center;
   justify-content: center;
 }
+
+/* =========================================================
+   Panel administrativo (Dashboard)
+   ========================================================= */
+/* Título a la izquierda y selector de periodo a la derecha */
+.admin-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.periodo {
+  width: 180px;
+}
+
+/* Tarjetas de números grandes */
+.indicador strong {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 8px 0;
+}
+
+/* Fila de dos tarjetas: la izquierda más ancha */
+.panel-fila {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+/* Título de cada tarjeta con texto chico a la derecha */
+.tarjeta-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 20px;
+}
+
+.tarjeta-titulo h3 {
+  margin: 0;
+}
+
+/* Gráfica de barras hecha solo con CSS */
+.grafica {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  height: 280px;
+}
+
+.barra-col {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.barra-col small {
+  color: var(--texto-suave);
+  margin-top: 8px;
+}
+
+.barra {
+  width: 100%;
+  background-color: var(--azul);
+  border-radius: 6px 6px 0 0;
+  margin-top: 6px;
+}
+
+/* El mes actual en azul claro */
+.barra-actual {
+  background-color: var(--azul-claro);
+}
+
+/* Lista del top 5 con barras de progreso */
+.top-fila {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.progreso {
+  height: 8px;
+  border-radius: 4px;
+  background-color: var(--fondo);
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.progreso div {
+  height: 100%;
+  background-color: var(--azul);
+}
+
+/* Tabla que llega hasta las orillas de la tarjeta */
+.sin-relleno {
+  padding: 0;
+  overflow: hidden;
+}
+
+.con-relleno {
+  padding: 28px 28px 0;
+}
+
+.tabla-admin th {
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: var(--fondo);
+}
+
+.tabla-admin th,
+.tabla-admin td {
+  padding: 14px 28px;
+}
+
+.tabla-admin td:first-child {
+  color: var(--texto);
+  font-weight: 700;
+}
+
+/* Etiquetas redondas de color */
+.insignia {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.insignia.roja {
+  background-color: #3b1219;
+  color: #f87171;
+}
+
+.insignia.amarilla {
+  background-color: #3a2a06;
+  color: #fbbf24;
+}
+
+/* Barra dividida de ventas por formato */
+.barra-formatos {
+  display: flex;
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.claro {
+  background-color: var(--azul-claro);
+}
+
+/* Cada renglón de la leyenda con su cuadrito de color */
+.leyenda {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.leyenda i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 8px;
+}
