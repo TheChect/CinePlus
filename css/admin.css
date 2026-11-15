@@ -316,3 +316,142 @@
   border-radius: 3px;
   margin-right: 8px;
 }
+
+/* =========================================================
+   Gestión de géneros y formatos
+   ========================================================= */
+.barra-busqueda {
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.tabla-catalogo td:nth-child(2) {
+  color: var(--texto);
+  font-weight: 700;
+}
+
+/* En estas tablas la primera columna es el ID, no va en negritas */
+.tabla-catalogo td:first-child {
+  font-weight: 400;
+}
+
+.insignia.azul {
+  background-color: var(--azul-banner);
+  color: #93c5fd;
+}
+
+.insignia.gris {
+  background-color: var(--borde);
+  color: var(--texto-suave);
+}
+
+/* Botones chicos de Editar y Eliminar en la tabla */
+.accion {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.accion:hover {
+  text-decoration: none;
+}
+
+.accion.editar {
+  background-color: var(--borde);
+  color: var(--azul-claro);
+}
+
+.accion.eliminar {
+  background-color: #2a1a22;
+  color: #f87171;
+}
+
+.total-registros {
+  margin-top: 16px;
+}
+
+/* ---------- Ventanas (modales) sin JavaScript ----------
+   .modal está oculta; con :target se muestra cuando la
+   dirección de la página termina en #id-de-la-ventana. */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal:target {
+  display: flex;
+}
+
+.modal-caja {
+  width: 560px;
+}
+
+.modal-caja label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 16px 0 6px;
+}
+
+textarea.campo {
+  resize: vertical;
+}
+
+.modal-botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.btn-rojo {
+  background-color: #dc2626;
+  color: #fff;
+}
+
+.btn-rojo:hover {
+  background-color: #b91c1c;
+}
+
+/* Círculo rojo con signo de admiración */
+.icono-alerta {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #3b1219;
+  color: #f87171;
+  font-size: 1.5rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+/* Recuadro con el nombre del registro a borrar */
+.registro-borrar {
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 16px 0;
+}
+
+.registro-borrar span {
+  display: block;
+}
+
+.alerta-amarilla {
+  background-color: #3a2a06;
+  color: #fbbf24;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 0;
+}
