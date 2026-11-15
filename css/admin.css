@@ -1,0 +1,144 @@
+/* =========================================================
+   Cine+ · Estilos del área de administración
+   Se carga después de estilos.css, así reutiliza sus
+   colores, botones, tarjetas y campos.
+   ========================================================= */
+
+/* ---------- Acceso administrativo ---------- */
+.acceso-admin {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 16px 0;
+}
+
+.acceso-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.acceso-logo .logo-cuadro {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+}
+
+/* "Recordar sesión" a la izquierda y el enlace a la derecha */
+.acceso-opciones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.caja-formulario .acceso-opciones .casilla {
+  margin: 0;
+}
+
+/* Recuadro rojo para mensajes de error */
+.alerta-error {
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  border-left: 3px solid #ef4444;
+  border-radius: 6px;
+  background-color: #3b1219;
+  color: #fca5a5;
+}
+
+/* ---------- Estructura general del panel ---------- */
+/* Barra lateral fija de 260px y el resto para el contenido */
+.admin {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- Barra lateral ---------- */
+.lateral {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--fondo-tarjeta);
+  border-right: 1px solid var(--borde);
+  padding: 24px 18px;
+}
+
+.lateral-titulo {
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  margin: 34px 0 8px;
+}
+
+.lateral-menu a {
+  display: block;
+  padding: 11px 14px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  color: var(--texto);
+}
+
+.lateral-menu a:hover {
+  background-color: var(--borde);
+  text-decoration: none;
+}
+
+/* Opción de la página actual en azul */
+.lateral-menu a.activo {
+  background-color: var(--azul);
+  color: #fff;
+}
+
+/* margin-top: auto empuja esta parte hasta abajo */
+.lateral-abajo {
+  margin-top: auto;
+}
+
+.lateral-abajo > a {
+  display: block;
+  color: var(--texto);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.admin-usuario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-usuario span {
+  display: block;
+}
+
+.avatar-chico {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+}
+
+/* ---------- Barra superior y contenido ---------- */
+.admin-barra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 30px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.buscador {
+  max-width: 420px;
+}
+
+.admin-contenido {
+  padding: 30px;
+}
+
+/* Recuadro temporal para el contenido que falta */
+.espacio-vacio {
+  margin-top: 24px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
