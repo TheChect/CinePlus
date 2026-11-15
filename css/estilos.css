@@ -711,3 +711,259 @@ a:hover {
   margin: 18px 0 0;
   color: var(--texto-suave);
 }
+
+/* =========================================================
+   Carrito y Finalizar compra
+   ========================================================= */
+/* Ruta "Catálogo / Carrito" arriba del título */
+.ruta {
+  color: var(--texto-suave);
+  margin-bottom: 14px;
+}
+
+.ruta span {
+  color: var(--azul-claro);
+}
+
+/* Lista a la izquierda y resumen a la derecha */
+.compra {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+/* Encabezado y filas del carrito usan las mismas columnas */
+.carrito-encabezado,
+.carrito-fila {
+  display: grid;
+  grid-template-columns: 90px 1fr 90px 120px 100px 30px;
+  gap: 16px;
+  align-items: center;
+}
+
+.carrito-encabezado {
+  color: var(--texto-suave);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.carrito-fila {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+/* Cuadro gris donde irá la portada */
+.mini-poster {
+  width: 90px;
+  height: 120px;
+  border-radius: 6px;
+  background-color: #1a2438;
+  border: 1px solid var(--borde);
+}
+
+.carrito-producto h4 {
+  margin-bottom: 2px;
+}
+
+.carrito-producto p {
+  margin-bottom: 6px;
+}
+
+/* Etiqueta de formato (reutiliza los colores f-4k, f-dvd...) */
+.etiqueta-formato {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.aviso-stock {
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.carrito-precio,
+.carrito-total {
+  text-align: right;
+}
+
+.carrito-precio span,
+.carrito-total span {
+  display: block;
+}
+
+.carrito-total strong {
+  color: var(--azul-claro);
+  font-size: 1.1rem;
+}
+
+/* Control de cantidad: [-] 1 [+] */
+.cantidad {
+  display: flex;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  overflow: hidden;
+  width: 110px;
+}
+
+.cantidad button {
+  width: 36px;
+  border: 0;
+  background-color: var(--fondo-tarjeta);
+  color: var(--texto);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.cantidad span {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  background-color: var(--fondo);
+}
+
+/* Botón para quitar un producto */
+.quitar {
+  border: 0;
+  background: none;
+  color: #ef4444;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.carrito-pie {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 18px;
+  font-weight: 700;
+}
+
+.rojo {
+  color: #ef4444;
+}
+
+.verde {
+  color: #22c55e;
+}
+
+/* Tarjeta del resumen */
+.resumen {
+  margin-bottom: 20px;
+}
+
+.resumen h3 {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.resumen-linea {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0;
+}
+
+.resumen-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--borde);
+  padding: 18px 0;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.resumen-total strong {
+  color: var(--azul-claro);
+  font-size: 1.4rem;
+}
+
+.resumen .btn {
+  margin-bottom: 12px;
+}
+
+/* Productos dentro del resumen de Finalizar compra */
+.resumen-producto {
+  display: grid;
+  grid-template-columns: 50px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  margin: 14px 0;
+}
+
+.chico-poster {
+  width: 50px;
+  height: 66px;
+}
+
+/* Formularios de Finalizar compra */
+.formulario-compra {
+  margin-bottom: 20px;
+}
+
+.formulario-compra label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 14px 0 6px;
+}
+
+/* Dos campos lado a lado */
+.dos-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Número del paso dentro de un círculo azul */
+.paso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--azul);
+  font-size: 0.9rem;
+  margin-right: 8px;
+}
+
+/* Caja de cada método de envío */
+.formulario-compra .opcion-envio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 400;
+}
+
+.precio-envio {
+  margin-left: auto;
+  color: var(--azul-claro);
+  font-weight: 700;
+}
+
+/* Aviso verde de pago seguro */
+.nota-segura {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background-color: #064e3b;
+  color: #d1fae5;
+}
+
+/* Títulos de Precio y Total alineados a la derecha como sus valores */
+.carrito-encabezado span:nth-child(3),
+.carrito-encabezado span:nth-child(5) {
+  text-align: right;
+}
