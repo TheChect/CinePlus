@@ -188,7 +188,7 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
     <nav class="lateral-menu">
       <a href="panel.html">Dashboard</a>
       <a href="usuarios.html">Gestión de Usuarios</a>
-      <a href="peliculas.html">Gestión de Películas</a>
+      <a href="peliculas.php">Gestión de Películas</a>
       <a href="generos.php">Gestión de Géneros</a>
       <a class="activo" href="formatos.php">Gestión de Formatos</a>
     </nav>

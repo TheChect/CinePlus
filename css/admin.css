@@ -722,3 +722,13 @@ textarea.campo {
 .modal.abierta {
   display: flex;
 }
+
+/* Botón "Filtrar" y enlace "Limpiar" junto a los filtros */
+.filtros-admin .btn {
+  padding: 9px 16px;
+}
+
+/* La portada real se recorta para llenar su espacio */
+img.mini-poster {
+  object-fit: cover;
+}
