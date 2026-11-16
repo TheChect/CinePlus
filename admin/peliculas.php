@@ -13,6 +13,9 @@ $con = conectar();
 const POCA_EXISTENCIA = 5;
 const POR_PAGINA = 10;
 
+// Mensaje después de guardar una película nueva
+$mensaje = isset($_GET['creado']) ? 'Película guardada correctamente.' : '';
+
 // ---------- Leer los filtros que llegan por GET ----------
 $buscar    = trim($_GET['buscar'] ?? '');
 $idFormato = (int) ($_GET['formato'] ?? 0);   // 0 = todos
@@ -152,7 +155,7 @@ function enlacePagina(int $numero): string
           <h1>Catálogo de películas</h1>
           <p class="texto-suave">Administra el inventario de la tienda: títulos, formatos, precios y existencias.</p>
         </div>
-        <a class="btn btn-primario" href="pelicula_form.html">+ Nueva película</a>
+        <a class="btn btn-primario" href="pelicula_form.php">+ Nueva película</a>
       </div>
 
       <!-- Buscador y filtros: se envían por GET a esta misma página -->
@@ -187,6 +190,10 @@ function enlacePagina(int $numero): string
           <a class="chico" href="peliculas.php">Limpiar</a>
         <?php endif; ?>
       </form>
+
+      <?php if ($mensaje !== ''): ?>
+        <p class="alerta-exito"><?= e($mensaje) ?></p>
+      <?php endif; ?>
 
       <!-- Tabla de películas de la base de datos -->
       <div class="tarjeta sin-relleno">
@@ -233,8 +240,8 @@ function enlacePagina(int $numero): string
               <td class="<?= $p['existencia'] <= POCA_EXISTENCIA ? 'amarillo-texto' : '' ?>"><?= $p['existencia'] ?> uds.</td>
               <td><span class="insignia <?= $claseEstado ?>"><?= $textoEstado ?></span></td>
               <td class="acciones">
-                <a class="accion ver" href="pelicula_form.html">Ver</a>
-                <a class="accion editar" href="pelicula_form.html">Editar</a>
+                <a class="accion ver" href="pelicula_form.php">Ver</a>
+                <a class="accion editar" href="pelicula_form.php">Editar</a>
                 <a class="accion eliminar" href="#eliminar">Eliminar</a>
               </td>
             </tr>

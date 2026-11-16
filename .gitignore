@@ -1,0 +1,3 @@
+# Portadas subidas desde el panel (son datos, no código)
+img/portadas/*
+!img/portadas/.gitkeep

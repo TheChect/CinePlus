@@ -732,3 +732,29 @@ textarea.campo {
 img.mini-poster {
   object-fit: cover;
 }
+
+/* =========================================================
+   Formulario de películas
+   ========================================================= */
+/* El input de archivo se oculta: el label con forma de botón lo abre */
+.archivo-oculto {
+  display: none;
+}
+
+/* Lista de errores arriba del formulario */
+.lista-errores {
+  margin: 0 0 20px;
+}
+
+.lista-errores ul {
+  margin: 6px 0 0 18px;
+}
+
+.admin-contenido > .alerta-amarilla {
+  margin-bottom: 20px;
+}
+
+.alerta-amarilla a {
+  color: #fde68a;
+  text-decoration: underline;
+}
