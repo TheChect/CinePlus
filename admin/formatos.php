@@ -1,60 +1,162 @@
 <?php
 /*
- * Cine+ · Gestión de formatos (CRUD, parte 1: listar y crear)
- * - Lee los formatos de la tabla Formato con el número de películas de cada uno.
- * - La ventana "Nuevo formato" envía un formulario POST que hace un INSERT.
- * Editar y Eliminar todavía son solo diseño.
+ * Cine+ · Gestión de formatos (CRUD completo)
+ * - Listar: lee la tabla Formato con el número de películas de cada uno.
+ * - Crear:  ventana "Nuevo formato" -> POST accion=crear -> INSERT.
+ * - Editar: formatos.php?editar=ID abre la ventana con los datos -> POST accion=editar -> UPDATE.
+ * - Eliminar: formatos.php?eliminar=ID pide confirmación -> POST accion=eliminar -> DELETE.
  */
 require __DIR__ . '/../config/conexion.php';
 $con = conectar();
 
-$mensaje = '';        // texto que se muestra arriba de la tabla
-$tipoMensaje = '';    // 'exito' o 'error'
-$abrirNuevo = false;  // si hubo error, la ventana se vuelve a abrir
+$mensaje = '';         // texto que se muestra arriba de la tabla
+$tipoMensaje = '';     // 'exito' o 'error'
+$abrirNuevo = false;   // si hubo error al crear, la ventana se vuelve a abrir
 $nombre = '';
 $descripcion = '';
+$editar = null;        // formato que se está editando (o null)
+$errorEditar = '';
+$eliminar = null;      // formato que se va a eliminar (o null)
 
-// ---------- Crear un formato (cuando se envía el formulario) ----------
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'crear') {
+// Busca un formato por su ID y regresa sus datos con el número de películas
+function buscarFormato(mysqli $con, int $id): ?array
+{
+    $consulta = $con->prepare('SELECT f.id_formato, f.nombre, f.descripcion, COUNT(p.id_pelicula) AS peliculas
+                               FROM Formato f
+                               LEFT JOIN Pelicula p ON p.id_formato = f.id_formato
+                               WHERE f.id_formato = ?
+                               GROUP BY f.id_formato, f.nombre, f.descripcion');
+    $consulta->bind_param('i', $id);
+    $consulta->execute();
+    $fila = $consulta->get_result()->fetch_assoc();
+    $consulta->close();
+    return $fila ?: null;
+}
+
+// Revisa nombre y descripción; regresa el mensaje de error o '' si todo está bien.
+// $idIgnorar sirve al editar: el nombre puede repetirse con el mismo registro.
+function validarFormato(mysqli $con, string $nombre, string $descripcion, int $idIgnorar = 0): string
+{
+    if ($nombre === '') {
+        return 'El nombre es obligatorio.';
+    }
+    if (mb_strlen($nombre) > 30) {
+        return 'El nombre no puede tener más de 30 caracteres.';
+    }
+    if (mb_strlen($descripcion) > 200) {
+        return 'La descripción no puede tener más de 200 caracteres.';
+    }
+    $buscar = $con->prepare('SELECT COUNT(*) FROM Formato WHERE nombre = ? AND id_formato <> ?');
+    $buscar->bind_param('si', $nombre, $idIgnorar);
+    $buscar->execute();
+    $buscar->bind_result($existe);
+    $buscar->fetch();
+    $buscar->close();
+    if ($existe > 0) {
+        return 'Ya existe un formato llamado "' . $nombre . '".';
+    }
+    return '';
+}
+
+$accion = $_POST['accion'] ?? '';
+
+// ---------- Crear ----------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'crear') {
     $nombre = trim($_POST['nombre'] ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
+    $mensaje = validarFormato($con, $nombre, $descripcion);
 
-    if ($nombre === '') {
-        $mensaje = 'El nombre es obligatorio.';
-    } elseif (mb_strlen($nombre) > 30) {
-        $mensaje = 'El nombre no puede tener más de 30 caracteres.';
-    } elseif (mb_strlen($descripcion) > 200) {
-        $mensaje = 'La descripción no puede tener más de 200 caracteres.';
-    } else {
-        // ¿Ya existe un formato con ese nombre? (consulta preparada)
-        $buscar = $con->prepare('SELECT COUNT(*) FROM Formato WHERE nombre = ?');
-        $buscar->bind_param('s', $nombre);
-        $buscar->execute();
-        $buscar->bind_result($existe);
-        $buscar->fetch();
-        $buscar->close();
-
-        if ($existe > 0) {
-            $mensaje = 'Ya existe un formato llamado "' . $nombre . '".';
-        } else {
-            // Si la descripción viene vacía se guarda como NULL
-            $desc = $descripcion === '' ? null : $descripcion;
-            $insertar = $con->prepare('INSERT INTO Formato (nombre, descripcion) VALUES (?, ?)');
-            $insertar->bind_param('ss', $nombre, $desc);
-            $insertar->execute();
-            $insertar->close();
-            // Se redirige para que al recargar no se vuelva a guardar
-            header('Location: formatos.php?creado=1');
-            exit;
-        }
+    if ($mensaje === '') {
+        $desc = $descripcion === '' ? null : $descripcion;   // vacía se guarda como NULL
+        $insertar = $con->prepare('INSERT INTO Formato (nombre, descripcion) VALUES (?, ?)');
+        $insertar->bind_param('ss', $nombre, $desc);
+        $insertar->execute();
+        $insertar->close();
+        // Se redirige para que al recargar no se vuelva a guardar
+        header('Location: formatos.php?creado=1');
+        exit;
     }
     $tipoMensaje = 'error';
     $abrirNuevo = true;
 }
 
+// ---------- Editar (guardar cambios) ----------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'editar') {
+    $id = (int) ($_POST['id'] ?? 0);
+    $editar = buscarFormato($con, $id);
+
+    if ($editar === null) {
+        $mensaje = 'El formato que intentas editar ya no existe.';
+        $tipoMensaje = 'error';
+    } else {
+        $nuevoNombre = trim($_POST['nombre'] ?? '');
+        $nuevaDesc = trim($_POST['descripcion'] ?? '');
+        $errorEditar = validarFormato($con, $nuevoNombre, $nuevaDesc, $id);
+
+        if ($errorEditar === '') {
+            $desc = $nuevaDesc === '' ? null : $nuevaDesc;
+            $actualizar = $con->prepare('UPDATE Formato SET nombre = ?, descripcion = ? WHERE id_formato = ?');
+            $actualizar->bind_param('ssi', $nuevoNombre, $desc, $id);
+            $actualizar->execute();
+            $actualizar->close();
+            header('Location: formatos.php?editado=1');
+            exit;
+        }
+        // Si hubo error se vuelve a mostrar la ventana con lo que se escribió
+        $editar['nombre'] = $nuevoNombre;
+        $editar['descripcion'] = $nuevaDesc;
+    }
+}
+
+// ---------- Eliminar (después de confirmar) ----------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'eliminar') {
+    $id = (int) ($_POST['id'] ?? 0);
+    $formato = buscarFormato($con, $id);
+
+    if ($formato === null) {
+        $mensaje = 'El formato que intentas eliminar ya no existe.';
+    } elseif ($formato['peliculas'] > 0) {
+        // Primera revisión: si tiene películas no se borra
+        $mensaje = 'No se puede eliminar "' . $formato['nombre'] . '" porque tiene ' . $formato['peliculas'] . ' película(s) registrada(s).';
+    } else {
+        try {
+            $borrar = $con->prepare('DELETE FROM Formato WHERE id_formato = ?');
+            $borrar->bind_param('i', $id);
+            $borrar->execute();
+            $borrar->close();
+            header('Location: formatos.php?eliminado=1');
+            exit;
+        } catch (mysqli_sql_exception $ex) {
+            // Segunda revisión: la llave foránea (ON DELETE RESTRICT) también lo impide.
+            // El código 1451 significa que otra tabla todavía usa este registro.
+            if ($ex->getCode() === 1451) {
+                $mensaje = 'No se puede eliminar "' . $formato['nombre'] . '" porque hay películas que lo usan.';
+            } else {
+                $mensaje = 'No se pudo eliminar el formato: ' . $ex->getMessage();
+            }
+        }
+    }
+    $tipoMensaje = 'error';
+}
+
+// ---------- Mensajes después de redirigir ----------
 if (isset($_GET['creado'])) {
     $mensaje = 'Formato creado correctamente.';
     $tipoMensaje = 'exito';
+} elseif (isset($_GET['editado'])) {
+    $mensaje = 'Formato actualizado correctamente.';
+    $tipoMensaje = 'exito';
+} elseif (isset($_GET['eliminado'])) {
+    $mensaje = 'Formato eliminado correctamente.';
+    $tipoMensaje = 'exito';
+}
+
+// ---------- Abrir las ventanas de editar o eliminar desde el enlace ----------
+if (isset($_GET['editar'])) {
+    $editar = buscarFormato($con, (int) $_GET['editar']);
+}
+if (isset($_GET['eliminar'])) {
+    $eliminar = buscarFormato($con, (int) $_GET['eliminar']);
 }
 
 // ---------- Listar los formatos con cuántas películas tiene cada uno ----------
@@ -151,8 +253,9 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
               <!-- Insignia azul si tiene películas, gris si tiene 0 -->
               <td><span class="insignia <?= $f['peliculas'] > 0 ? 'azul' : 'gris' ?>"><?= $f['peliculas'] ?></span></td>
               <td>
-                <a class="accion editar" href="#editar">Editar</a>
-                <a class="accion eliminar" href="#eliminar">Eliminar</a>
+                <!-- El ID viaja en la dirección: PHP abre la ventana con ese formato -->
+                <a class="accion editar" href="formatos.php?editar=<?= $f['id_formato'] ?>">Editar</a>
+                <a class="accion eliminar" href="formatos.php?eliminar=<?= $f['id_formato'] ?>">Eliminar</a>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -163,8 +266,9 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
     </main>
 
     <!-- ===== Ventanas (modales) =====
-         Están ocultas y solo se ven cuando la dirección termina en #nuevo, #editar o #eliminar.
-         "Cancelar" usa href="#" para quitar ese final y cerrarlas. -->
+         "Nuevo" se abre con #nuevo (CSS :target). Editar y Eliminar las abre PHP
+         con la clase "abierta" cuando la dirección trae ?editar=ID o ?eliminar=ID.
+         "Cancelar" regresa a formatos.php y las cierra. -->
 
     <!-- Crear: formulario real que se envía por POST a esta misma página -->
     <div class="modal<?= $abrirNuevo ? ' abierta' : '' ?>" id="nuevo">
@@ -188,39 +292,59 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
       </form>
     </div>
 
-    <!-- Editar (todavía solo diseño, se conecta en el siguiente paso) -->
-    <div class="modal" id="editar">
-      <form class="tarjeta modal-caja" action="#">
+    <!-- Editar: se muestra cuando PHP encontró el formato de ?editar=ID -->
+    <?php if ($editar !== null): ?>
+    <div class="modal abierta" id="editar">
+      <form class="tarjeta modal-caja" method="post" action="formatos.php">
+        <input type="hidden" name="accion" value="editar">
+        <input type="hidden" name="id" value="<?= $editar['id_formato'] ?>">
         <h2>Editar formato</h2>
-        <p class="texto-suave">Modifica los datos del registro con ID 2.</p>
+        <p class="texto-suave">Modifica los datos del registro con ID <?= $editar['id_formato'] ?>.</p>
+        <?php if ($errorEditar !== ''): ?>
+          <p class="alerta-error chico"><?= e($errorEditar) ?></p>
+        <?php endif; ?>
         <label for="editar-nombre">Nombre *</label>
-        <input class="campo" type="text" id="editar-nombre" value="Blu-ray">
+        <input class="campo" type="text" id="editar-nombre" name="nombre" maxlength="30" required
+               value="<?= e($editar['nombre']) ?>">
         <label for="editar-desc">Descripción</label>
-        <textarea class="campo" id="editar-desc" rows="3">Disco de alta definición Full HD (1080p)</textarea>
+        <textarea class="campo" id="editar-desc" name="descripcion" rows="3" maxlength="200"><?= e($editar['descripcion'] ?? '') ?></textarea>
         <div class="modal-botones">
-          <a class="btn btn-secundario" href="#">Cancelar</a>
-          <a class="btn btn-primario" href="#">Guardar cambios</a>
+          <a class="btn btn-secundario" href="formatos.php">Cancelar</a>
+          <button class="btn btn-primario" type="submit">Guardar cambios</button>
         </div>
       </form>
     </div>
+    <?php endif; ?>
 
-    <!-- Confirmar eliminación (todavía solo diseño) -->
-    <div class="modal" id="eliminar">
-      <div class="tarjeta modal-caja">
+    <!-- Confirmar eliminación: se muestra con ?eliminar=ID -->
+    <?php if ($eliminar !== null): ?>
+    <div class="modal abierta" id="eliminar">
+      <form class="tarjeta modal-caja" method="post" action="formatos.php">
+        <input type="hidden" name="accion" value="eliminar">
+        <input type="hidden" name="id" value="<?= $eliminar['id_formato'] ?>">
         <div class="icono-alerta">!</div>
         <h2>¿Eliminar este formato?</h2>
         <p class="texto-suave">Esta acción no se puede deshacer. Se eliminará el registro de la tabla Formato.</p>
         <div class="registro-borrar">
-          <strong>4K Ultra HD</strong>
-          <span class="texto-suave chico">ID 3 · 3 películas registradas</span>
+          <strong><?= e($eliminar['nombre']) ?></strong>
+          <span class="texto-suave chico">ID <?= $eliminar['id_formato'] ?> · <?= $eliminar['peliculas'] ?> películas registradas</span>
         </div>
-        <p class="alerta-amarilla chico">Solo se pueden eliminar los formatos que no tienen películas registradas.</p>
-        <div class="modal-botones">
-          <a class="btn btn-secundario" href="#">Cancelar</a>
-          <a class="btn btn-rojo" href="#">Sí, eliminar</a>
-        </div>
-      </div>
+        <?php if ($eliminar['peliculas'] > 0): ?>
+          <!-- Si tiene películas no se muestra el botón de borrar -->
+          <p class="alerta-error chico">Este formato tiene películas registradas, por eso no se puede eliminar. Cambia primero el formato de esas películas.</p>
+          <div class="modal-botones">
+            <a class="btn btn-secundario" href="formatos.php">Cerrar</a>
+          </div>
+        <?php else: ?>
+          <p class="alerta-amarilla chico">Solo se pueden eliminar los formatos que no tienen películas registradas.</p>
+          <div class="modal-botones">
+            <a class="btn btn-secundario" href="formatos.php">Cancelar</a>
+            <button class="btn btn-rojo" type="submit">Sí, eliminar</button>
+          </div>
+        <?php endif; ?>
+      </form>
     </div>
+    <?php endif; ?>
   </div>
 
 </div>
