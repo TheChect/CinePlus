@@ -700,3 +700,25 @@ textarea.campo {
 .filtros-admin select {
   width: 165px;
 }
+
+/* =========================================================
+   Mensajes y ventanas abiertas desde PHP
+   ========================================================= */
+/* Recuadro verde para mensajes de éxito */
+.alerta-exito {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 3px solid #22c55e;
+  border-radius: 6px;
+  background-color: #052e1c;
+  color: #86efac;
+}
+
+.admin-contenido > .alerta-error {
+  margin: 0 0 16px;
+}
+
+/* PHP agrega la clase "abierta" para mostrar la ventana si hubo un error */
+.modal.abierta {
+  display: flex;
+}
