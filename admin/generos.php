@@ -1,60 +1,162 @@
 <?php
 /*
- * Cine+ · Gestión de géneros (CRUD, parte 1: listar y crear)
- * - Lee los géneros de la tabla Genero con el número de películas de cada uno.
- * - La ventana "Nuevo género" envía un formulario POST que hace un INSERT.
- * Editar y Eliminar todavía son solo diseño.
+ * Cine+ · Gestión de géneros (CRUD completo)
+ * - Listar: lee la tabla Genero con el número de películas de cada uno.
+ * - Crear:  ventana "Nuevo género" -> POST accion=crear -> INSERT.
+ * - Editar: generos.php?editar=ID abre la ventana con los datos -> POST accion=editar -> UPDATE.
+ * - Eliminar: generos.php?eliminar=ID pide confirmación -> POST accion=eliminar -> DELETE.
  */
 require __DIR__ . '/../config/conexion.php';
 $con = conectar();
 
-$mensaje = '';        // texto que se muestra arriba de la tabla
-$tipoMensaje = '';    // 'exito' o 'error'
-$abrirNuevo = false;  // si hubo error, la ventana se vuelve a abrir
+$mensaje = '';         // texto que se muestra arriba de la tabla
+$tipoMensaje = '';     // 'exito' o 'error'
+$abrirNuevo = false;   // si hubo error al crear, la ventana se vuelve a abrir
 $nombre = '';
 $descripcion = '';
+$editar = null;        // género que se está editando (o null)
+$errorEditar = '';
+$eliminar = null;      // género que se va a eliminar (o null)
 
-// ---------- Crear un género (cuando se envía el formulario) ----------
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'crear') {
+// Busca un género por su ID y regresa sus datos con el número de películas
+function buscarGenero(mysqli $con, int $id): ?array
+{
+    $consulta = $con->prepare('SELECT g.id_genero, g.nombre, g.descripcion, COUNT(p.id_pelicula) AS peliculas
+                               FROM Genero g
+                               LEFT JOIN Pelicula p ON p.id_genero = g.id_genero
+                               WHERE g.id_genero = ?
+                               GROUP BY g.id_genero, g.nombre, g.descripcion');
+    $consulta->bind_param('i', $id);
+    $consulta->execute();
+    $fila = $consulta->get_result()->fetch_assoc();
+    $consulta->close();
+    return $fila ?: null;
+}
+
+// Revisa nombre y descripción; regresa el mensaje de error o '' si todo está bien.
+// $idIgnorar sirve al editar: el nombre puede repetirse con el mismo registro.
+function validarGenero(mysqli $con, string $nombre, string $descripcion, int $idIgnorar = 0): string
+{
+    if ($nombre === '') {
+        return 'El nombre es obligatorio.';
+    }
+    if (mb_strlen($nombre) > 50) {
+        return 'El nombre no puede tener más de 50 caracteres.';
+    }
+    if (mb_strlen($descripcion) > 200) {
+        return 'La descripción no puede tener más de 200 caracteres.';
+    }
+    $buscar = $con->prepare('SELECT COUNT(*) FROM Genero WHERE nombre = ? AND id_genero <> ?');
+    $buscar->bind_param('si', $nombre, $idIgnorar);
+    $buscar->execute();
+    $buscar->bind_result($existe);
+    $buscar->fetch();
+    $buscar->close();
+    if ($existe > 0) {
+        return 'Ya existe un género llamado "' . $nombre . '".';
+    }
+    return '';
+}
+
+$accion = $_POST['accion'] ?? '';
+
+// ---------- Crear ----------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'crear') {
     $nombre = trim($_POST['nombre'] ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
+    $mensaje = validarGenero($con, $nombre, $descripcion);
 
-    if ($nombre === '') {
-        $mensaje = 'El nombre es obligatorio.';
-    } elseif (mb_strlen($nombre) > 50) {
-        $mensaje = 'El nombre no puede tener más de 50 caracteres.';
-    } elseif (mb_strlen($descripcion) > 200) {
-        $mensaje = 'La descripción no puede tener más de 200 caracteres.';
-    } else {
-        // ¿Ya existe un género con ese nombre? (consulta preparada)
-        $buscar = $con->prepare('SELECT COUNT(*) FROM Genero WHERE nombre = ?');
-        $buscar->bind_param('s', $nombre);
-        $buscar->execute();
-        $buscar->bind_result($existe);
-        $buscar->fetch();
-        $buscar->close();
-
-        if ($existe > 0) {
-            $mensaje = 'Ya existe un género llamado "' . $nombre . '".';
-        } else {
-            // Si la descripción viene vacía se guarda como NULL
-            $desc = $descripcion === '' ? null : $descripcion;
-            $insertar = $con->prepare('INSERT INTO Genero (nombre, descripcion) VALUES (?, ?)');
-            $insertar->bind_param('ss', $nombre, $desc);
-            $insertar->execute();
-            $insertar->close();
-            // Se redirige para que al recargar no se vuelva a guardar
-            header('Location: generos.php?creado=1');
-            exit;
-        }
+    if ($mensaje === '') {
+        $desc = $descripcion === '' ? null : $descripcion;   // vacía se guarda como NULL
+        $insertar = $con->prepare('INSERT INTO Genero (nombre, descripcion) VALUES (?, ?)');
+        $insertar->bind_param('ss', $nombre, $desc);
+        $insertar->execute();
+        $insertar->close();
+        // Se redirige para que al recargar no se vuelva a guardar
+        header('Location: generos.php?creado=1');
+        exit;
     }
     $tipoMensaje = 'error';
     $abrirNuevo = true;
 }
 
+// ---------- Editar (guardar cambios) ----------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'editar') {
+    $id = (int) ($_POST['id'] ?? 0);
+    $editar = buscarGenero($con, $id);
+
+    if ($editar === null) {
+        $mensaje = 'El género que intentas editar ya no existe.';
+        $tipoMensaje = 'error';
+    } else {
+        $nuevoNombre = trim($_POST['nombre'] ?? '');
+        $nuevaDesc = trim($_POST['descripcion'] ?? '');
+        $errorEditar = validarGenero($con, $nuevoNombre, $nuevaDesc, $id);
+
+        if ($errorEditar === '') {
+            $desc = $nuevaDesc === '' ? null : $nuevaDesc;
+            $actualizar = $con->prepare('UPDATE Genero SET nombre = ?, descripcion = ? WHERE id_genero = ?');
+            $actualizar->bind_param('ssi', $nuevoNombre, $desc, $id);
+            $actualizar->execute();
+            $actualizar->close();
+            header('Location: generos.php?editado=1');
+            exit;
+        }
+        // Si hubo error se vuelve a mostrar la ventana con lo que se escribió
+        $editar['nombre'] = $nuevoNombre;
+        $editar['descripcion'] = $nuevaDesc;
+    }
+}
+
+// ---------- Eliminar (después de confirmar) ----------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'eliminar') {
+    $id = (int) ($_POST['id'] ?? 0);
+    $genero = buscarGenero($con, $id);
+
+    if ($genero === null) {
+        $mensaje = 'El género que intentas eliminar ya no existe.';
+    } elseif ($genero['peliculas'] > 0) {
+        // Primera revisión: si tiene películas no se borra
+        $mensaje = 'No se puede eliminar "' . $genero['nombre'] . '" porque tiene ' . $genero['peliculas'] . ' película(s) registrada(s).';
+    } else {
+        try {
+            $borrar = $con->prepare('DELETE FROM Genero WHERE id_genero = ?');
+            $borrar->bind_param('i', $id);
+            $borrar->execute();
+            $borrar->close();
+            header('Location: generos.php?eliminado=1');
+            exit;
+        } catch (mysqli_sql_exception $ex) {
+            // Segunda revisión: la llave foránea (ON DELETE RESTRICT) también lo impide.
+            // El código 1451 significa que otra tabla todavía usa este registro.
+            if ($ex->getCode() === 1451) {
+                $mensaje = 'No se puede eliminar "' . $genero['nombre'] . '" porque hay películas que lo usan.';
+            } else {
+                $mensaje = 'No se pudo eliminar el género: ' . $ex->getMessage();
+            }
+        }
+    }
+    $tipoMensaje = 'error';
+}
+
+// ---------- Mensajes después de redirigir ----------
 if (isset($_GET['creado'])) {
     $mensaje = 'Género creado correctamente.';
     $tipoMensaje = 'exito';
+} elseif (isset($_GET['editado'])) {
+    $mensaje = 'Género actualizado correctamente.';
+    $tipoMensaje = 'exito';
+} elseif (isset($_GET['eliminado'])) {
+    $mensaje = 'Género eliminado correctamente.';
+    $tipoMensaje = 'exito';
+}
+
+// ---------- Abrir las ventanas de editar o eliminar desde el enlace ----------
+if (isset($_GET['editar'])) {
+    $editar = buscarGenero($con, (int) $_GET['editar']);
+}
+if (isset($_GET['eliminar'])) {
+    $eliminar = buscarGenero($con, (int) $_GET['eliminar']);
 }
 
 // ---------- Listar los géneros con cuántas películas tiene cada uno ----------
@@ -151,8 +253,9 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
               <!-- Insignia azul si tiene películas, gris si tiene 0 -->
               <td><span class="insignia <?= $g['peliculas'] > 0 ? 'azul' : 'gris' ?>"><?= $g['peliculas'] ?></span></td>
               <td>
-                <a class="accion editar" href="#editar">Editar</a>
-                <a class="accion eliminar" href="#eliminar">Eliminar</a>
+                <!-- El ID viaja en la dirección: PHP abre la ventana con ese género -->
+                <a class="accion editar" href="generos.php?editar=<?= $g['id_genero'] ?>">Editar</a>
+                <a class="accion eliminar" href="generos.php?eliminar=<?= $g['id_genero'] ?>">Eliminar</a>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -163,8 +266,9 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
     </main>
 
     <!-- ===== Ventanas (modales) =====
-         Están ocultas y solo se ven cuando la dirección termina en #nuevo, #editar o #eliminar.
-         "Cancelar" usa href="#" para quitar ese final y cerrarlas. -->
+         "Nuevo" se abre con #nuevo (CSS :target). Editar y Eliminar las abre PHP
+         con la clase "abierta" cuando la dirección trae ?editar=ID o ?eliminar=ID.
+         "Cancelar" regresa a generos.php y las cierra. -->
 
     <!-- Crear: formulario real que se envía por POST a esta misma página -->
     <div class="modal<?= $abrirNuevo ? ' abierta' : '' ?>" id="nuevo">
@@ -188,39 +292,59 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
       </form>
     </div>
 
-    <!-- Editar (todavía solo diseño, se conecta en el siguiente paso) -->
-    <div class="modal" id="editar">
-      <form class="tarjeta modal-caja" action="#">
+    <!-- Editar: se muestra cuando PHP encontró el género de ?editar=ID -->
+    <?php if ($editar !== null): ?>
+    <div class="modal abierta" id="editar">
+      <form class="tarjeta modal-caja" method="post" action="generos.php">
+        <input type="hidden" name="accion" value="editar">
+        <input type="hidden" name="id" value="<?= $editar['id_genero'] ?>">
         <h2>Editar género</h2>
-        <p class="texto-suave">Modifica los datos del registro con ID 3.</p>
+        <p class="texto-suave">Modifica los datos del registro con ID <?= $editar['id_genero'] ?>.</p>
+        <?php if ($errorEditar !== ''): ?>
+          <p class="alerta-error chico"><?= e($errorEditar) ?></p>
+        <?php endif; ?>
         <label for="editar-nombre">Nombre *</label>
-        <input class="campo" type="text" id="editar-nombre" value="Ciencia ficción">
+        <input class="campo" type="text" id="editar-nombre" name="nombre" maxlength="50" required
+               value="<?= e($editar['nombre']) ?>">
         <label for="editar-desc">Descripción</label>
-        <textarea class="campo" id="editar-desc" rows="3">Historias con ciencia y tecnología del futuro</textarea>
+        <textarea class="campo" id="editar-desc" name="descripcion" rows="3" maxlength="200"><?= e($editar['descripcion'] ?? '') ?></textarea>
         <div class="modal-botones">
-          <a class="btn btn-secundario" href="#">Cancelar</a>
-          <a class="btn btn-primario" href="#">Guardar cambios</a>
+          <a class="btn btn-secundario" href="generos.php">Cancelar</a>
+          <button class="btn btn-primario" type="submit">Guardar cambios</button>
         </div>
       </form>
     </div>
+    <?php endif; ?>
 
-    <!-- Confirmar eliminación (todavía solo diseño) -->
-    <div class="modal" id="eliminar">
-      <div class="tarjeta modal-caja">
+    <!-- Confirmar eliminación: se muestra con ?eliminar=ID -->
+    <?php if ($eliminar !== null): ?>
+    <div class="modal abierta" id="eliminar">
+      <form class="tarjeta modal-caja" method="post" action="generos.php">
+        <input type="hidden" name="accion" value="eliminar">
+        <input type="hidden" name="id" value="<?= $eliminar['id_genero'] ?>">
         <div class="icono-alerta">!</div>
         <h2>¿Eliminar este género?</h2>
         <p class="texto-suave">Esta acción no se puede deshacer. Se eliminará el registro de la tabla Genero.</p>
         <div class="registro-borrar">
-          <strong>Aventura</strong>
-          <span class="texto-suave chico">ID 2 · 0 películas registradas</span>
+          <strong><?= e($eliminar['nombre']) ?></strong>
+          <span class="texto-suave chico">ID <?= $eliminar['id_genero'] ?> · <?= $eliminar['peliculas'] ?> películas registradas</span>
         </div>
-        <p class="alerta-amarilla chico">Solo se pueden eliminar los géneros que no tienen películas registradas.</p>
-        <div class="modal-botones">
-          <a class="btn btn-secundario" href="#">Cancelar</a>
-          <a class="btn btn-rojo" href="#">Sí, eliminar</a>
-        </div>
-      </div>
+        <?php if ($eliminar['peliculas'] > 0): ?>
+          <!-- Si tiene películas no se muestra el botón de borrar -->
+          <p class="alerta-error chico">Este género tiene películas registradas, por eso no se puede eliminar. Cambia primero el género de esas películas.</p>
+          <div class="modal-botones">
+            <a class="btn btn-secundario" href="generos.php">Cerrar</a>
+          </div>
+        <?php else: ?>
+          <p class="alerta-amarilla chico">Solo se pueden eliminar los géneros que no tienen películas registradas.</p>
+          <div class="modal-botones">
+            <a class="btn btn-secundario" href="generos.php">Cancelar</a>
+            <button class="btn btn-rojo" type="submit">Sí, eliminar</button>
+          </div>
+        <?php endif; ?>
+      </form>
     </div>
+    <?php endif; ?>
   </div>
 
 </div>
