@@ -195,7 +195,7 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
 
     <!-- Parte de abajo: cerrar sesión y datos del administrador -->
     <div class="lateral-abajo">
-      <a href="acceso.html">&larr; Cerrar sesión</a>
+      <a href="../logout.php">&larr; Cerrar sesión</a>
       <div class="admin-usuario">
         <div class="avatar avatar-chico"></div>
         <div>

@@ -792,3 +792,8 @@ img.iniciales {
   border-radius: 50%;
   object-fit: cover;
 }
+
+/* Botón de iniciar sesión del acceso administrativo */
+.acceso-admin form .btn-primario {
+  margin-top: 20px;
+}

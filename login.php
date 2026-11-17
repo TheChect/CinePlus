@@ -1,3 +1,40 @@
+<?php
+/*
+ * Cine+ · Iniciar sesión (clientes y administradores)
+ * - Revisa correo y contraseña con password_verify() (funciones en config/sesion.php).
+ * - Si entra bien, guarda id, nombre y rol en la sesión y lo manda a su página:
+ *   Administrador -> panel, Cliente -> inicio.
+ */
+require __DIR__ . '/config/conexion.php';
+require __DIR__ . '/config/sesion.php';
+
+// Si ya tiene sesión, no tiene caso volver a iniciarla
+$actual = usuarioActual();
+if ($actual !== null) {
+    header('Location: ' . paginaInicioSegunRol($actual['rol']));
+    exit;
+}
+
+$correo = '';
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $correo = trim($_POST['correo'] ?? '');
+    $contrasena = $_POST['contrasena'] ?? '';
+
+    if ($correo === '' || $contrasena === '') {
+        $error = 'Escribe tu correo y tu contraseña.';
+    } else {
+        $con = conectar();
+        $usuario = verificarCredenciales($con, $correo, $contrasena, $error);
+        if ($usuario !== null) {
+            iniciarSesion($con, $usuario);
+            header('Location: ' . paginaInicioSegunRol($usuario['rol']));
+            exit;
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <!-- Cine+ · Iniciar sesión -->
 <html lang="es">
@@ -24,7 +61,7 @@
     </nav>
 
     <div class="menu-cuenta">
-      <a href="login.html">Iniciar sesión</a>
+      <a href="login.php">Iniciar sesión</a>
       <a class="btn btn-primario" href="registro.php">Suscribirse</a>
     </div>
   </div>
@@ -32,28 +69,36 @@
 
 <main>
 
-<!-- Formulario de inicio de sesión (solo diseño, todavía no envía datos) -->
+<!-- Formulario de inicio de sesión: se envía por POST a esta misma página -->
 <section class="seccion">
   <div class="caja-formulario tarjeta">
     <h2>Inicia sesión</h2>
     <p class="texto-suave chico">Entra a tu cuenta para usar el carrito y comprar.</p>
 
-    <form action="#">
+    <?php if (isset($_GET['salida'])): ?>
+      <p class="alerta-exito">Cerraste sesión correctamente.</p>
+    <?php endif; ?>
+    <?php if ($error !== ''): ?>
+      <p class="alerta-error"><?= e($error) ?></p>
+    <?php endif; ?>
+
+    <form method="post" action="login.php">
       <label for="correo">Correo electrónico</label>
-      <input class="campo" type="email" id="correo" placeholder="nombre@correo.com">
+      <input class="campo" type="email" id="correo" name="correo" required placeholder="nombre@correo.com" value="<?= e($correo) ?>">
 
       <label for="contrasena">Contraseña</label>
-      <input class="campo" type="password" id="contrasena" placeholder="••••••••">
+      <input class="campo" type="password" id="contrasena" name="contrasena" required placeholder="••••••••">
 
-      <a class="olvide chico" href="#">¿Olvidaste tu contraseña?</a>
+      <a class="olvide chico" href="contacto.html">¿Olvidaste tu contraseña?</a>
 
-      <button class="btn btn-primario btn-bloque" type="button">Iniciar sesión</button>
+      <button class="btn btn-primario btn-bloque" type="submit">Iniciar sesión</button>
     </form>
 
     <!-- Línea separadora con la letra "o" en medio -->
     <div class="separador"><span>o</span></div>
 
-    <button class="btn btn-secundario btn-bloque" type="button">Continuar con Google</button>
+    <!-- El inicio con Google no forma parte del proyecto por ahora -->
+    <button class="btn btn-secundario btn-bloque" type="button" disabled title="Próximamente">Continuar con Google (próximamente)</button>
 
     <p class="cambio chico">¿No tienes una cuenta? <a href="registro.php">Regístrate</a></p>
   </div>
@@ -79,7 +124,7 @@
 
     <div>
       <h4>Mi cuenta</h4>
-      <a href="login.html">Iniciar sesión</a>
+      <a href="login.php">Iniciar sesión</a>
       <a href="registro.php">Crear cuenta</a>
       <a href="carrito.html">Carrito</a>
       <a href="perfil.html">Mi perfil</a>

@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 
     <div class="menu-cuenta">
-      <a href="login.html">Iniciar sesión</a>
+      <a href="login.php">Iniciar sesión</a>
       <a class="btn btn-primario" href="registro.php">Suscribirse</a>
     </div>
   </div>
@@ -114,13 +114,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- Formulario para crear cuenta: se envía por POST a esta misma página -->
 <section class="seccion">
   <div class="caja-formulario tarjeta">
-    <a class="chico" href="login.html">&larr; Volver</a>
+    <a class="chico" href="login.php">&larr; Volver</a>
     <h2>Crear cuenta</h2>
 
     <?php if ($creada): ?>
       <!-- Mensaje después de registrarse -->
       <p class="alerta-exito">¡Tu cuenta se creó correctamente! Ya puedes iniciar sesión con tu correo y contraseña.</p>
-      <a class="btn btn-primario btn-bloque" href="login.html">Iniciar sesión</a>
+      <a class="btn btn-primario btn-bloque" href="login.php">Iniciar sesión</a>
     <?php else: ?>
     <p class="texto-suave chico">Regístrate para comprar y guardar tus pedidos.</p>
 
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- El registro con Google no forma parte del proyecto por ahora -->
     <button class="btn btn-secundario btn-bloque" type="button" disabled title="Próximamente">Registrarse con Google (próximamente)</button>
 
-    <p class="cambio chico">¿Ya tienes una cuenta? <a href="login.html">Inicia sesión</a></p>
+    <p class="cambio chico">¿Ya tienes una cuenta? <a href="login.php">Inicia sesión</a></p>
     <?php endif; ?>
   </div>
 </section>
@@ -186,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div>
       <h4>Mi cuenta</h4>
-      <a href="login.html">Iniciar sesión</a>
+      <a href="login.php">Iniciar sesión</a>
       <a href="registro.php">Crear cuenta</a>
       <a href="carrito.html">Carrito</a>
       <a href="perfil.html">Mi perfil</a>
