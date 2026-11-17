@@ -4,17 +4,93 @@
  * - La tabla sale de Pelicula unida (JOIN) con Genero y Formato.
  * - El buscador y los filtros se envían por GET y se aplican con una consulta preparada.
  * - Las 4 tarjetas de abajo se calculan con COUNT sobre la tabla Pelicula.
- * Crear, Editar y Eliminar todavía son solo diseño.
+ * - Editar lleva a pelicula_form.php?id=ID.
+ * - Eliminar abre una confirmación con ?eliminar=ID. Si la película ya se vendió
+ *   no se borra (se pierde el historial de pedidos): se pasa a Borrador.
  */
 require __DIR__ . '/../config/conexion.php';
 $con = conectar();
+
+// Busca una película con su formato y cuántas unidades se han vendido
+function buscarPelicula(mysqli $con, int $id): ?array
+{
+    $consulta = $con->prepare('SELECT p.id_pelicula, p.titulo, p.anio, p.existencia, p.imagen, f.nombre AS formato,
+                                      (SELECT COUNT(*) FROM Detalle_Pedido d WHERE d.id_pelicula = p.id_pelicula) AS ventas
+                               FROM Pelicula p
+                               JOIN Formato f ON f.id_formato = p.id_formato
+                               WHERE p.id_pelicula = ?');
+    $consulta->bind_param('i', $id);
+    $consulta->execute();
+    $fila = $consulta->get_result()->fetch_assoc();
+    $consulta->close();
+    return $fila ?: null;
+}
 
 // Películas con 5 unidades o menos se consideran "poca existencia"
 const POCA_EXISTENCIA = 5;
 const POR_PAGINA = 10;
 
-// Mensaje después de guardar una película nueva
-$mensaje = isset($_GET['creado']) ? 'Película guardada correctamente.' : '';
+$mensaje = '';
+$tipoMensaje = 'exito';
+
+// ---------- Eliminar (después de confirmar) ----------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'eliminar') {
+    $id = (int) ($_POST['id'] ?? 0);
+    $pelicula = buscarPelicula($con, $id);
+
+    if ($pelicula === null) {
+        $mensaje = 'La película que intentas eliminar ya no existe.';
+        $tipoMensaje = 'error';
+    } elseif ($pelicula['ventas'] > 0) {
+        // Ya tiene ventas: no se borra, solo se oculta de la tienda
+        $ocultar = $con->prepare("UPDATE Pelicula SET estado = 'Borrador' WHERE id_pelicula = ?");
+        $ocultar->bind_param('i', $id);
+        $ocultar->execute();
+        $ocultar->close();
+        header('Location: peliculas.php?borrador=1');
+        exit;
+    } else {
+        try {
+            $borrar = $con->prepare('DELETE FROM Pelicula WHERE id_pelicula = ?');
+            $borrar->bind_param('i', $id);
+            $borrar->execute();
+            $borrar->close();
+            // También se borra el archivo de su portada
+            if ($pelicula['imagen'] !== null && str_starts_with($pelicula['imagen'], 'img/portadas/')) {
+                $archivo = __DIR__ . '/../img/portadas/' . basename($pelicula['imagen']);
+                if (is_file($archivo)) {
+                    unlink($archivo);
+                }
+            }
+            header('Location: peliculas.php?eliminado=1');
+            exit;
+        } catch (mysqli_sql_exception $ex) {
+            // Por si acaso: la llave foránea de Detalle_Pedido impide borrar (error 1451)
+            $mensaje = $ex->getCode() === 1451
+                ? 'No se puede eliminar porque la película tiene pedidos registrados.'
+                : 'No se pudo eliminar la película: ' . $ex->getMessage();
+            $tipoMensaje = 'error';
+        }
+    }
+}
+
+// ---------- Mensajes después de redirigir ----------
+if (isset($_GET['creado'])) {
+    $mensaje = 'Película guardada correctamente.';
+} elseif (isset($_GET['editado'])) {
+    $mensaje = 'Película actualizada correctamente.';
+} elseif (isset($_GET['eliminado'])) {
+    $mensaje = 'Película eliminada correctamente.';
+} elseif (isset($_GET['borrador'])) {
+    $mensaje = 'La película ya tiene ventas, así que no se borró: se cambió a Borrador y ya no aparece en la tienda.';
+    $tipoMensaje = 'aviso';
+} elseif (isset($_GET['noexiste'])) {
+    $mensaje = 'La película que buscas no existe.';
+    $tipoMensaje = 'error';
+}
+
+// Película que se va a eliminar (abre la ventana de confirmación)
+$eliminar = isset($_GET['eliminar']) ? buscarPelicula($con, (int) $_GET['eliminar']) : null;
 
 // ---------- Leer los filtros que llegan por GET ----------
 $buscar    = trim($_GET['buscar'] ?? '');
@@ -94,6 +170,15 @@ $resumen = $con->query('SELECT COUNT(*) AS registradas,
                                SUM(existencia > 0 AND existencia <= ' . POCA_EXISTENCIA . ') AS poca,
                                SUM(existencia = 0) AS agotadas
                         FROM Pelicula')->fetch_assoc();
+
+// Dirección para abrir la confirmación de eliminar sin perder los filtros
+function enlaceEliminar(int $id): string
+{
+    $parametros = $_GET;
+    unset($parametros['creado'], $parametros['editado'], $parametros['eliminado'], $parametros['borrador'], $parametros['noexiste']);
+    $parametros['eliminar'] = $id;
+    return 'peliculas.php?' . http_build_query($parametros);
+}
 
 // Arma la dirección de una página conservando los filtros actuales
 function enlacePagina(int $numero): string
@@ -192,7 +277,7 @@ function enlacePagina(int $numero): string
       </form>
 
       <?php if ($mensaje !== ''): ?>
-        <p class="alerta-exito"><?= e($mensaje) ?></p>
+        <p class="alerta-<?= $tipoMensaje ?>"><?= e($mensaje) ?></p>
       <?php endif; ?>
 
       <!-- Tabla de películas de la base de datos -->
@@ -240,9 +325,9 @@ function enlacePagina(int $numero): string
               <td class="<?= $p['existencia'] <= POCA_EXISTENCIA ? 'amarillo-texto' : '' ?>"><?= $p['existencia'] ?> uds.</td>
               <td><span class="insignia <?= $claseEstado ?>"><?= $textoEstado ?></span></td>
               <td class="acciones">
-                <a class="accion ver" href="pelicula_form.php">Ver</a>
-                <a class="accion editar" href="pelicula_form.php">Editar</a>
-                <a class="accion eliminar" href="#eliminar">Eliminar</a>
+                <a class="accion ver" href="pelicula_form.php?id=<?= $p['id_pelicula'] ?>">Ver</a>
+                <a class="accion editar" href="pelicula_form.php?id=<?= $p['id_pelicula'] ?>">Editar</a>
+                <a class="accion eliminar" href="<?= e(enlaceEliminar($p['id_pelicula'])) ?>">Eliminar</a>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -279,23 +364,40 @@ function enlacePagina(int $numero): string
       </div>
     </main>
 
-    <!-- Confirmar eliminación (todavía solo diseño, se conecta más adelante) -->
-    <div class="modal" id="eliminar">
-      <div class="tarjeta modal-caja">
+    <!-- Confirmar eliminación: se muestra cuando la dirección trae ?eliminar=ID -->
+    <?php if ($eliminar !== null): ?>
+    <div class="modal abierta" id="eliminar">
+      <form class="tarjeta modal-caja" method="post" action="peliculas.php">
+        <input type="hidden" name="accion" value="eliminar">
+        <input type="hidden" name="id" value="<?= $eliminar['id_pelicula'] ?>">
         <div class="icono-alerta">!</div>
         <h2>¿Eliminar esta película?</h2>
-        <p class="texto-suave">Esta acción no se puede deshacer. Se eliminará el registro de la tabla Pelicula.</p>
         <div class="registro-borrar">
-          <strong>Parásitos</strong>
-          <span class="texto-suave chico">DVD · 2019 · 0 uds. en existencia</span>
+          <strong><?= e($eliminar['titulo']) ?></strong>
+          <span class="texto-suave chico">
+            <?= e($eliminar['formato']) ?> · <?= $eliminar['anio'] ?? 'sin año' ?> · <?= $eliminar['existencia'] ?> uds. en existencia
+          </span>
         </div>
-        <p class="alerta-amarilla chico">Si la película ya tiene ventas no se borra: se cambia a Borrador para conservar el historial de pedidos.</p>
-        <div class="modal-botones">
-          <a class="btn btn-secundario" href="#">Cancelar</a>
-          <a class="btn btn-rojo" href="#">Sí, eliminar</a>
-        </div>
-      </div>
+        <?php if ($eliminar['ventas'] > 0): ?>
+          <!-- Con ventas: no se borra, se pasa a Borrador -->
+          <p class="alerta-amarilla chico">
+            Esta película ya aparece en <?= $eliminar['ventas'] ?> venta(s). Para no perder el historial de pedidos
+            no se borrará: se cambiará a Borrador y dejará de verse en la tienda.
+          </p>
+          <div class="modal-botones">
+            <a class="btn btn-secundario" href="peliculas.php">Cancelar</a>
+            <button class="btn btn-rojo" type="submit">Pasar a Borrador</button>
+          </div>
+        <?php else: ?>
+          <p class="texto-suave">Esta acción no se puede deshacer. Se eliminará el registro de la tabla Pelicula y su portada.</p>
+          <div class="modal-botones">
+            <a class="btn btn-secundario" href="peliculas.php">Cancelar</a>
+            <button class="btn btn-rojo" type="submit">Sí, eliminar</button>
+          </div>
+        <?php endif; ?>
+      </form>
     </div>
+    <?php endif; ?>
   </div>
 
 </div>

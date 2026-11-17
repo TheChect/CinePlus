@@ -758,3 +758,23 @@ img.mini-poster {
   color: #fde68a;
   text-decoration: underline;
 }
+
+/* Portada actual en el formulario de editar película */
+.portada-actual {
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border-radius: var(--radio);
+  margin-top: 10px;
+  background-color: var(--fondo);
+}
+
+/* Mensaje amarillo (aviso) arriba de la tabla */
+.alerta-aviso {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 3px solid #f59e0b;
+  border-radius: 6px;
+  background-color: #3a2a06;
+  color: #fbbf24;
+}
