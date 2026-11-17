@@ -7,7 +7,9 @@
  * - Eliminar abre una confirmación con ?eliminar=ID. Si el usuario ya tiene pedidos
  *   no se borra (se perderían datos de las ventas): se suspende su cuenta.
  */
-require __DIR__ . '/../config/conexion.php';
+// Solo administradores con sesión iniciada (si no, se redirige y aquí se detiene)
+require __DIR__ . '/../config/solo_admin.php';
+require_once __DIR__ . '/../config/conexion.php';
 $con = conectar();
 
 const POR_PAGINA = 10;
@@ -213,11 +215,11 @@ function enlacePagina(int $numero): string
 
   <!-- Barra lateral con el menú de administración -->
   <aside class="lateral">
-    <a class="logo" href="panel.html"><span class="logo-cuadro"></span> CINE+</a>
+    <a class="logo" href="panel.php"><span class="logo-cuadro"></span> CINE+</a>
 
     <p class="lateral-titulo">Principal</p>
     <nav class="lateral-menu">
-      <a href="panel.html">Dashboard</a>
+      <a href="panel.php">Dashboard</a>
       <a class="activo" href="usuarios.php">Gestión de Usuarios</a>
       <a href="peliculas.php">Gestión de Películas</a>
       <a href="generos.php">Gestión de Géneros</a>
@@ -230,8 +232,9 @@ function enlacePagina(int $numero): string
       <div class="admin-usuario">
         <div class="avatar avatar-chico"></div>
         <div>
-          <strong>Admin Central</strong>
-          <span class="texto-suave chico">admin@cineplus.com</span>
+          <!-- Datos del administrador que inició sesión -->
+          <strong><?= e($admin['nombre']) ?></strong>
+          <span class="texto-suave chico"><?= e($admin['correo']) ?></span>
         </div>
       </div>
     </div>

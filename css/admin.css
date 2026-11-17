@@ -797,3 +797,8 @@ img.iniciales {
 .acceso-admin form .btn-primario {
   margin-top: 20px;
 }
+
+/* Avisos dentro del acceso administrativo */
+.acceso-admin .alerta-amarilla {
+  margin: 14px 0 0;
+}
