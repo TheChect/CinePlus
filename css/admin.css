@@ -835,3 +835,8 @@ img.iniciales {
 .color-3 { background-color: #d97706; }
 
 .rojo { color: #ef4444; }
+
+/* Buscador de la barra superior (ahora es un formulario) */
+form.buscador {
+  width: 420px;
+}

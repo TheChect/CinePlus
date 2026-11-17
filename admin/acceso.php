@@ -125,7 +125,7 @@ if ($hayAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
           </ul>
         </div>
       <?php endif; ?>
-      <form method="post" action="acceso.php">
+      <form method="post" action="acceso.php" data-validar>
         <input type="hidden" name="accion" value="primer_admin">
         <label for="nombre">Nombre completo</label>
         <input class="campo" type="text" id="nombre" name="nombre" maxlength="100" required value="<?= e($nombre) ?>">
@@ -134,7 +134,7 @@ if ($hayAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="contrasena">Contraseña</label>
         <input class="campo" type="password" id="contrasena" name="contrasena" minlength="8" required placeholder="Mínimo 8 caracteres">
         <label for="confirmar">Confirmar contraseña</label>
-        <input class="campo" type="password" id="confirmar" name="confirmar" minlength="8" required>
+        <input class="campo" type="password" id="confirmar" name="confirmar" minlength="8" required data-igual-a="contrasena">
         <button class="btn btn-primario btn-bloque" type="submit">Crear administrador y entrar</button>
       </form>
     <?php else: ?>
@@ -145,7 +145,7 @@ if ($hayAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
       <p class="alerta-error chico"><?= e($error) ?></p>
     <?php endif; ?>
 
-    <form method="post" action="acceso.php">
+    <form method="post" action="acceso.php" data-validar>
       <label for="usuario">Correo</label>
       <input class="campo" type="email" id="usuario" name="correo" required placeholder="admin@cineplus.com" value="<?= e($correo) ?>">
 
@@ -161,5 +161,7 @@ if ($hayAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <p class="pie-copy centrado">© 2026 Cine+. Acceso exclusivo para administradores.</p>
 
+<!-- Validaciones de formularios antes de enviarlos -->
+<script src="../js/validaciones.js"></script>
 </body>
 </html>

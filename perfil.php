@@ -190,7 +190,7 @@ include __DIR__ . '/includes/encabezado.php';
     <?php endif; ?>
 
     <!-- Datos personales -->
-    <form method="post" action="perfil.php">
+    <form method="post" action="perfil.php" data-validar>
       <input type="hidden" name="accion" value="datos">
       <label for="nombre">Nombre completo</label>
       <input class="campo" type="text" id="nombre" name="nombre" maxlength="100" required value="<?= e($datos['nombre']) ?>">
@@ -199,7 +199,7 @@ include __DIR__ . '/includes/encabezado.php';
       <input class="campo" type="email" id="correo" name="correo" maxlength="120" required value="<?= e($datos['correo']) ?>">
 
       <label for="telefono">Teléfono</label>
-      <input class="campo" type="tel" id="telefono" name="telefono" maxlength="10" placeholder="10 dígitos" value="<?= e($datos['telefono']) ?>">
+      <input class="campo" type="tel" id="telefono" name="telefono" maxlength="10" pattern="[0-9]{10}" data-mensaje="El teléfono debe tener 10 dígitos (solo números)." placeholder="10 dígitos" value="<?= e($datos['telefono']) ?>">
 
       <label for="pais">País o región</label>
       <select class="campo" id="pais" name="pais_region">
@@ -226,14 +226,14 @@ include __DIR__ . '/includes/encabezado.php';
         </div>
       <?php endif; ?>
 
-      <form method="post" action="perfil.php">
+      <form method="post" action="perfil.php" data-validar>
         <input type="hidden" name="accion" value="contrasena">
         <label for="actual">Contraseña actual</label>
         <input class="campo" type="password" id="actual" name="actual" required>
         <label for="nueva">Nueva contraseña</label>
         <input class="campo" type="password" id="nueva" name="nueva" minlength="8" required placeholder="Mínimo 8 caracteres">
         <label for="confirmar">Confirmar nueva contraseña</label>
-        <input class="campo" type="password" id="confirmar" name="confirmar" minlength="8" required>
+        <input class="campo" type="password" id="confirmar" name="confirmar" minlength="8" required data-igual-a="nueva">
         <button class="btn btn-secundario btn-bloque" type="submit">Cambiar contraseña</button>
       </form>
     </details>

@@ -268,7 +268,7 @@ include __DIR__ . '/includes/encabezado.php';
     <?php endif; ?>
 
     <!-- Un solo formulario: los campos y el botón de la derecha se unen a él con form="form-compra" -->
-    <form id="form-compra" method="post" action="finalizar.php"></form>
+    <form id="form-compra" method="post" action="finalizar.php" data-validar></form>
 
     <div class="compra">
 
@@ -284,7 +284,7 @@ include __DIR__ . '/includes/encabezado.php';
             </div>
             <div>
               <label for="telefono">Teléfono de contacto</label>
-              <input class="campo" type="tel" id="telefono" name="telefono" form="form-compra" maxlength="10" required placeholder="10 dígitos" value="<?= e($datos['telefono']) ?>">
+              <input class="campo" type="tel" id="telefono" name="telefono" form="form-compra" maxlength="10" required pattern="[0-9]{10}" data-mensaje="El teléfono debe tener 10 dígitos (solo números)." placeholder="10 dígitos" value="<?= e($datos['telefono']) ?>">
             </div>
           </div>
 
@@ -294,7 +294,7 @@ include __DIR__ . '/includes/encabezado.php';
           <div class="dos-campos">
             <div>
               <label for="cp">Código postal</label>
-              <input class="campo" type="text" id="cp" name="codigo_postal" form="form-compra" maxlength="5" required placeholder="66450" value="<?= e($datos['codigo_postal']) ?>">
+              <input class="campo" type="text" id="cp" name="codigo_postal" form="form-compra" maxlength="5" required pattern="[0-9]{5}" data-mensaje="El código postal debe tener 5 dígitos." placeholder="66450" value="<?= e($datos['codigo_postal']) ?>">
             </div>
             <div>
               <label for="ciudad">Ciudad</label>

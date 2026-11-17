@@ -57,7 +57,7 @@ include __DIR__ . '/includes/encabezado.php';
       <p class="alerta-exito">Inicia sesión para terminar tu compra. Tu carrito se conserva.</p>
     <?php endif; ?>
 
-    <form method="post" action="login.php">
+    <form method="post" action="login.php" data-validar>
       <?php if ($volverCarrito): ?>
         <input type="hidden" name="volver" value="carrito">
       <?php endif; ?>

@@ -162,12 +162,19 @@ if (isset($_GET['eliminar'])) {
 }
 
 // ---------- Listar los géneros con cuántas películas tiene cada uno ----------
-$sql = 'SELECT g.id_genero, g.nombre, g.descripcion, COUNT(p.id_pelicula) AS peliculas
+// El buscador filtra por nombre o descripción (si se escribió algo)
+$buscar = trim($_GET['buscar'] ?? '');
+$texto = '%' . $buscar . '%';
+$listar = $con->prepare('SELECT g.id_genero, g.nombre, g.descripcion, COUNT(p.id_pelicula) AS peliculas
         FROM Genero g
         LEFT JOIN Pelicula p ON p.id_genero = g.id_genero
+        WHERE g.nombre LIKE ? OR g.descripcion LIKE ?
         GROUP BY g.id_genero, g.nombre, g.descripcion
-        ORDER BY g.nombre';
-$generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
+        ORDER BY g.nombre');
+$listar->bind_param('ss', $texto, $texto);
+$listar->execute();
+$generos = $listar->get_result()->fetch_all(MYSQLI_ASSOC);
+$listar->close();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -212,7 +219,10 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
   <!-- Lado derecho: barra superior y contenido -->
   <div class="admin-derecha">
     <header class="admin-barra">
-      <input class="campo buscador" type="search" placeholder="Buscar en el panel...">
+      <!-- Búsqueda rápida de películas desde cualquier pantalla del panel -->
+      <form class="buscador" method="get" action="peliculas.php">
+        <input class="campo" type="search" name="buscar" placeholder="Buscar películas por título o director...">
+      </form>
       <div class="avatar avatar-chico"></div>
     </header>
 
@@ -227,10 +237,12 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
         <a class="btn btn-primario" href="#nuevo">+ Nuevo género</a>
       </div>
 
-      <!-- Buscador (solo diseño) -->
-      <div class="tarjeta barra-busqueda">
-        <input class="campo" type="search" placeholder="Buscar género...">
-      </div>
+      <!-- Buscador: se envía por GET a esta misma página -->
+      <form class="tarjeta barra-busqueda filtros-admin" method="get" action="generos.php">
+        <input class="campo" type="search" name="buscar" placeholder="Buscar género..." value="<?= e($buscar) ?>">
+        <button class="btn btn-secundario" type="submit">Buscar</button>
+        <?php if ($buscar !== ''): ?><a class="chico" href="generos.php">Limpiar</a><?php endif; ?>
+      </form>
 
       <!-- Mensaje de éxito o de error -->
       <?php if ($mensaje !== ''): ?>
@@ -245,7 +257,7 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
           </thead>
           <tbody>
             <?php if (count($generos) === 0): ?>
-              <tr><td colspan="5" class="centrado">Todavía no hay géneros registrados.</td></tr>
+              <tr><td colspan="5" class="centrado"><?= $buscar === '' ? 'Todavía no hay géneros registrados.' : 'No se encontraron géneros con esa búsqueda.' ?></td></tr>
             <?php endif; ?>
 
             <?php foreach ($generos as $g): ?>
@@ -275,7 +287,7 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
 
     <!-- Crear: formulario real que se envía por POST a esta misma página -->
     <div class="modal<?= $abrirNuevo ? ' abierta' : '' ?>" id="nuevo">
-      <form class="tarjeta modal-caja" method="post" action="generos.php">
+      <form class="tarjeta modal-caja" method="post" action="generos.php" data-validar>
         <input type="hidden" name="accion" value="crear">
         <h2>Nuevo género</h2>
         <p class="texto-suave">Agrega un género al catálogo. El nombre no se puede repetir.</p>
@@ -298,7 +310,7 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
     <!-- Editar: se muestra cuando PHP encontró el género de ?editar=ID -->
     <?php if ($editar !== null): ?>
     <div class="modal abierta" id="editar">
-      <form class="tarjeta modal-caja" method="post" action="generos.php">
+      <form class="tarjeta modal-caja" method="post" action="generos.php" data-validar>
         <input type="hidden" name="accion" value="editar">
         <input type="hidden" name="id" value="<?= $editar['id_genero'] ?>">
         <h2>Editar género</h2>
@@ -322,7 +334,7 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
     <!-- Confirmar eliminación: se muestra con ?eliminar=ID -->
     <?php if ($eliminar !== null): ?>
     <div class="modal abierta" id="eliminar">
-      <form class="tarjeta modal-caja" method="post" action="generos.php">
+      <form class="tarjeta modal-caja" method="post" action="generos.php" data-validar>
         <input type="hidden" name="accion" value="eliminar">
         <input type="hidden" name="id" value="<?= $eliminar['id_genero'] ?>">
         <div class="icono-alerta">!</div>
@@ -352,5 +364,7 @@ $generos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
 
 </div>
 
+<!-- Validaciones de formularios antes de enviarlos -->
+<script src="../js/validaciones.js"></script>
 </body>
 </html>

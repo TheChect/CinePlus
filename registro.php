@@ -105,7 +105,7 @@ include __DIR__ . '/includes/encabezado.php';
       </div>
     <?php endif; ?>
 
-    <form method="post" action="registro.php">
+    <form method="post" action="registro.php" data-validar>
       <label for="nombre">Nombre completo</label>
       <input class="campo" type="text" id="nombre" name="nombre" maxlength="100" required placeholder="Tu nombre" value="<?= e($nombre) ?>">
 
@@ -117,7 +117,7 @@ include __DIR__ . '/includes/encabezado.php';
       <input class="campo" type="password" id="contrasena" name="contrasena" minlength="8" required placeholder="Mínimo 8 caracteres">
 
       <label for="confirmar">Confirmar contraseña</label>
-      <input class="campo" type="password" id="confirmar" name="confirmar" minlength="8" required placeholder="Repite tu contraseña">
+      <input class="campo" type="password" id="confirmar" name="confirmar" minlength="8" required data-igual-a="contrasena" placeholder="Repite tu contraseña">
 
       <!-- Casilla para aceptar términos (obligatoria) -->
       <label class="casilla chico">

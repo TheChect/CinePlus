@@ -250,7 +250,10 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
   <!-- Lado derecho: barra superior y contenido -->
   <div class="admin-derecha">
     <header class="admin-barra">
-      <input class="campo buscador" type="search" placeholder="Buscar en el panel...">
+      <!-- Búsqueda rápida de películas desde cualquier pantalla del panel -->
+      <form class="buscador" method="get" action="peliculas.php">
+        <input class="campo" type="search" name="buscar" placeholder="Buscar películas por título o director...">
+      </form>
       <div class="avatar avatar-chico"></div>
     </header>
 
@@ -293,7 +296,7 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
       <?php endif; ?>
 
       <!-- enctype multipart/form-data es necesario para enviar archivos -->
-      <form class="formulario-admin" id="form-pelicula" method="post" action="pelicula_form.php<?= $editando ? '?id=' . $id : '' ?>" enctype="multipart/form-data">
+      <form class="formulario-admin" id="form-pelicula" data-validar method="post" action="pelicula_form.php<?= $editando ? '?id=' . $id : '' ?>" enctype="multipart/form-data">
         <!-- Al editar, el id viaja en un campo oculto -->
         <?php if ($editando): ?>
           <input type="hidden" name="id" value="<?= $id ?>">
@@ -314,7 +317,7 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
           <?php endif; ?>
           <!-- El input de archivo va dentro de un label con forma de botón -->
           <label class="btn btn-secundario btn-bloque">Seleccionar archivo
-            <input type="file" name="portada" accept="image/jpeg,image/png,image/webp" class="archivo-oculto">
+            <input type="file" name="portada" accept="image/jpeg,image/png,image/webp" data-max-mb="2" class="archivo-oculto">
           </label>
           <?php if (count($errores) > 0): ?>
             <p class="texto-suave chico">Si elegiste una portada, vuelve a seleccionarla.</p>
@@ -394,5 +397,7 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
 
 </div>
 
+<!-- Validaciones de formularios antes de enviarlos -->
+<script src="../js/validaciones.js"></script>
 </body>
 </html>

@@ -4,12 +4,29 @@
  * Crea la base de datos cineplus ejecutando bd/cineplus.sql.
  * Abre http://localhost/cineplus/instalar.php una sola vez.
  * OJO: si la base ya existe, se borra y se vuelve a crear vacía.
+ * Protección: si la base ya tiene un administrador activo, solo un administrador
+ * con sesión iniciada puede reinstalarla (así nadie de fuera puede borrar los datos).
  */
 require __DIR__ . '/config/conexion.php';
+require __DIR__ . '/config/sesion.php';
+
+// ¿Ya está instalada y con al menos un administrador?
+$instalada = false;
+try {
+    $revisar = conectar();
+    $instalada = $revisar->query("SELECT COUNT(*) FROM Usuario u JOIN Rol r ON r.id_rol = u.id_rol
+                                  WHERE r.nombre = 'Administrador' AND u.estado = 'Activo'")->fetch_row()[0] > 0;
+} catch (mysqli_sql_exception $ex) {
+    $instalada = false;   // la base o las tablas todavía no existen
+}
+$sesion = usuarioActual();
+$permitido = !$instalada || ($sesion !== null && $sesion['rol'] === 'Administrador');
 
 $mensaje = '';
 $ok = false;
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $permitido && $instalada && !isset($_POST['confirmo'])) {
+    $mensaje = 'Marca la casilla para confirmar que se borrarán todos los datos.';
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && $permitido) {
     try {
         $sql = file_get_contents(__DIR__ . '/bd/cineplus.sql');
         $con = conectar(false);              // sin base de datos: el script la crea
@@ -50,11 +67,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($mensaje): ?>
       <div class="alerta <?= $ok ? 'exito' : 'error' ?>"><?= e($mensaje) ?></div>
     <?php endif; ?>
+    <?php if ($ok): ?>
+      <!-- Siguiente paso después de instalar -->
+      <p><a href="admin/acceso.php">Crear la primera cuenta de administrador &rarr;</a></p>
+    <?php elseif (!$permitido): ?>
+      <!-- Ya instalada: solo un administrador con sesión puede reinstalar -->
+      <div class="alerta error">La base de datos ya está instalada. Para reinstalarla, primero
+        <a href="admin/acceso.php">inicia sesión como administrador</a>.</div>
+    <?php else: ?>
     <p>Se creará la base de datos <strong>cineplus</strong> con sus 8 tablas y los roles Administrador y Cliente (sin datos de ejemplo).
        Si ya existe, se borrará y se volverá a crear.</p>
     <form method="post">
+      <?php if ($instalada): ?>
+        <p><label><input type="checkbox" name="confirmo" value="1"> Entiendo que se borrarán todas las películas, cuentas y pedidos.</label></p>
+      <?php endif; ?>
       <button type="submit">Crear base de datos</button>
     </form>
+    <?php endif; ?>
   </div>
 </body>
 </html>

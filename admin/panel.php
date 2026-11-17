@@ -80,7 +80,10 @@ function cantidadCorta(float $cantidad): string
   <!-- Lado derecho: barra superior y contenido -->
   <div class="admin-derecha">
     <header class="admin-barra">
-      <input class="campo buscador" type="search" placeholder="Buscar en el panel...">
+      <!-- Búsqueda rápida de películas desde cualquier pantalla del panel -->
+      <form class="buscador" method="get" action="peliculas.php">
+        <input class="campo" type="search" name="buscar" placeholder="Buscar películas por título o director...">
+      </form>
       <div class="avatar avatar-chico"></div>
     </header>
 

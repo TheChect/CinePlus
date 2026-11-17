@@ -51,5 +51,7 @@
   </div>
 </footer>
 
+<!-- Validaciones de formularios antes de enviarlos -->
+<script src="js/validaciones.js"></script>
 </body>
 </html>

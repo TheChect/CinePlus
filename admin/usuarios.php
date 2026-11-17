@@ -243,7 +243,10 @@ function enlacePagina(int $numero): string
   <!-- Lado derecho: barra superior y contenido -->
   <div class="admin-derecha">
     <header class="admin-barra">
-      <input class="campo buscador" type="search" placeholder="Buscar en el panel...">
+      <!-- Búsqueda rápida de películas desde cualquier pantalla del panel -->
+      <form class="buscador" method="get" action="peliculas.php">
+        <input class="campo" type="search" name="buscar" placeholder="Buscar películas por título o director...">
+      </form>
       <div class="avatar avatar-chico"></div>
     </header>
 
@@ -386,5 +389,7 @@ function enlacePagina(int $numero): string
 
 </div>
 
+<!-- Validaciones de formularios antes de enviarlos -->
+<script src="../js/validaciones.js"></script>
 </body>
 </html>

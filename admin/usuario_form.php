@@ -279,7 +279,10 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
   <!-- Lado derecho: barra superior y contenido -->
   <div class="admin-derecha">
     <header class="admin-barra">
-      <input class="campo buscador" type="search" placeholder="Buscar en el panel...">
+      <!-- Búsqueda rápida de películas desde cualquier pantalla del panel -->
+      <form class="buscador" method="get" action="peliculas.php">
+        <input class="campo" type="search" name="buscar" placeholder="Buscar películas por título o director...">
+      </form>
       <div class="avatar avatar-chico"></div>
     </header>
 
@@ -316,7 +319,7 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
         </div>
       <?php endif; ?>
 
-      <form class="formulario-admin" id="form-usuario" method="post" action="usuario_form.php<?= $editando ? '?id=' . $id : '' ?>" enctype="multipart/form-data">
+      <form class="formulario-admin" id="form-usuario" data-validar method="post" action="usuario_form.php<?= $editando ? '?id=' . $id : '' ?>" enctype="multipart/form-data">
         <?php if ($editando): ?>
           <input type="hidden" name="id" value="<?= $id ?>">
         <?php endif; ?>
@@ -330,7 +333,7 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
           <?php endif; ?>
           <p class="texto-suave chico">Opcional. JPG, PNG o WEBP, máx. 1 MB</p>
           <label class="btn btn-secundario btn-bloque">Subir foto
-            <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="archivo-oculto">
+            <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" data-max-mb="1" class="archivo-oculto">
           </label>
         </div>
 
@@ -349,7 +352,7 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
           <div class="dos-campos">
             <div>
               <label for="telefono">Teléfono</label>
-              <input class="campo" id="telefono" name="telefono" type="tel" maxlength="10" placeholder="10 dígitos" value="<?= e($datos['telefono']) ?>">
+              <input class="campo" id="telefono" name="telefono" type="tel" maxlength="10" pattern="[0-9]{10}" data-mensaje="El teléfono debe tener 10 dígitos (solo números)." placeholder="10 dígitos" value="<?= e($datos['telefono']) ?>">
             </div>
             <div>
               <label for="pais">País o región</label>
@@ -372,7 +375,7 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
             </div>
             <div>
               <label for="confirmar">Confirmar contraseña *</label>
-              <input class="campo" id="confirmar" name="confirmar" type="password" minlength="8" <?= $editando ? '' : 'required' ?> placeholder="Repite la contraseña">
+              <input class="campo" id="confirmar" name="confirmar" type="password" minlength="8" data-igual-a="contrasena" <?= $editando ? '' : 'required' ?> placeholder="Repite la contraseña">
             </div>
           </div>
 
@@ -400,5 +403,7 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
 
 </div>
 
+<!-- Validaciones de formularios antes de enviarlos -->
+<script src="../js/validaciones.js"></script>
 </body>
 </html>

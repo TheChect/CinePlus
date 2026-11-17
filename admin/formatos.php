@@ -162,12 +162,19 @@ if (isset($_GET['eliminar'])) {
 }
 
 // ---------- Listar los formatos con cuántas películas tiene cada uno ----------
-$sql = 'SELECT f.id_formato, f.nombre, f.descripcion, COUNT(p.id_pelicula) AS peliculas
+// El buscador filtra por nombre o descripción (si se escribió algo)
+$buscar = trim($_GET['buscar'] ?? '');
+$texto = '%' . $buscar . '%';
+$listar = $con->prepare('SELECT f.id_formato, f.nombre, f.descripcion, COUNT(p.id_pelicula) AS peliculas
         FROM Formato f
         LEFT JOIN Pelicula p ON p.id_formato = f.id_formato
+        WHERE f.nombre LIKE ? OR f.descripcion LIKE ?
         GROUP BY f.id_formato, f.nombre, f.descripcion
-        ORDER BY f.nombre';
-$formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
+        ORDER BY f.nombre');
+$listar->bind_param('ss', $texto, $texto);
+$listar->execute();
+$formatos = $listar->get_result()->fetch_all(MYSQLI_ASSOC);
+$listar->close();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -212,7 +219,10 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
   <!-- Lado derecho: barra superior y contenido -->
   <div class="admin-derecha">
     <header class="admin-barra">
-      <input class="campo buscador" type="search" placeholder="Buscar en el panel...">
+      <!-- Búsqueda rápida de películas desde cualquier pantalla del panel -->
+      <form class="buscador" method="get" action="peliculas.php">
+        <input class="campo" type="search" name="buscar" placeholder="Buscar películas por título o director...">
+      </form>
       <div class="avatar avatar-chico"></div>
     </header>
 
@@ -227,10 +237,12 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
         <a class="btn btn-primario" href="#nuevo">+ Nuevo formato</a>
       </div>
 
-      <!-- Buscador (solo diseño) -->
-      <div class="tarjeta barra-busqueda">
-        <input class="campo" type="search" placeholder="Buscar formato...">
-      </div>
+      <!-- Buscador: se envía por GET a esta misma página -->
+      <form class="tarjeta barra-busqueda filtros-admin" method="get" action="formatos.php">
+        <input class="campo" type="search" name="buscar" placeholder="Buscar formato..." value="<?= e($buscar) ?>">
+        <button class="btn btn-secundario" type="submit">Buscar</button>
+        <?php if ($buscar !== ''): ?><a class="chico" href="formatos.php">Limpiar</a><?php endif; ?>
+      </form>
 
       <!-- Mensaje de éxito o de error -->
       <?php if ($mensaje !== ''): ?>
@@ -245,7 +257,7 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
           </thead>
           <tbody>
             <?php if (count($formatos) === 0): ?>
-              <tr><td colspan="5" class="centrado">Todavía no hay formatos registrados.</td></tr>
+              <tr><td colspan="5" class="centrado"><?= $buscar === '' ? 'Todavía no hay formatos registrados.' : 'No se encontraron formatos con esa búsqueda.' ?></td></tr>
             <?php endif; ?>
 
             <?php foreach ($formatos as $f): ?>
@@ -275,7 +287,7 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
 
     <!-- Crear: formulario real que se envía por POST a esta misma página -->
     <div class="modal<?= $abrirNuevo ? ' abierta' : '' ?>" id="nuevo">
-      <form class="tarjeta modal-caja" method="post" action="formatos.php">
+      <form class="tarjeta modal-caja" method="post" action="formatos.php" data-validar>
         <input type="hidden" name="accion" value="crear">
         <h2>Nuevo formato</h2>
         <p class="texto-suave">Agrega un formato al catálogo. El nombre no se puede repetir.</p>
@@ -298,7 +310,7 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
     <!-- Editar: se muestra cuando PHP encontró el formato de ?editar=ID -->
     <?php if ($editar !== null): ?>
     <div class="modal abierta" id="editar">
-      <form class="tarjeta modal-caja" method="post" action="formatos.php">
+      <form class="tarjeta modal-caja" method="post" action="formatos.php" data-validar>
         <input type="hidden" name="accion" value="editar">
         <input type="hidden" name="id" value="<?= $editar['id_formato'] ?>">
         <h2>Editar formato</h2>
@@ -322,7 +334,7 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
     <!-- Confirmar eliminación: se muestra con ?eliminar=ID -->
     <?php if ($eliminar !== null): ?>
     <div class="modal abierta" id="eliminar">
-      <form class="tarjeta modal-caja" method="post" action="formatos.php">
+      <form class="tarjeta modal-caja" method="post" action="formatos.php" data-validar>
         <input type="hidden" name="accion" value="eliminar">
         <input type="hidden" name="id" value="<?= $eliminar['id_formato'] ?>">
         <div class="icono-alerta">!</div>
@@ -352,5 +364,7 @@ $formatos = $con->query($sql)->fetch_all(MYSQLI_ASSOC);
 
 </div>
 
+<!-- Validaciones de formularios antes de enviarlos -->
+<script src="../js/validaciones.js"></script>
 </body>
 </html>
