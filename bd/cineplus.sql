@@ -1,5 +1,5 @@
 -- =====================================================================
---  Cine+  ·  Modelo de la base de datos (tablas y llaves, sin datos)
+--  Cine+  ·  Modelo de la base de datos (tablas, llaves y roles fijos; sin datos de ejemplo)
 --  Motor: MySQL 8 (compatible con MariaDB 10.6+ / XAMPP)
 -- =====================================================================
 DROP DATABASE IF EXISTS cineplus;
@@ -16,6 +16,11 @@ CREATE TABLE Rol (
   PRIMARY KEY (id_rol),
   UNIQUE KEY uq_rol_nombre (nombre)
 ) ENGINE=InnoDB;
+
+-- Roles fijos del sistema (no son datos de ejemplo): el panel los busca por nombre.
+INSERT INTO Rol (id_rol, nombre) VALUES
+  (1, 'Administrador'),
+  (2, 'Cliente');
 
 CREATE TABLE Genero (
   id_genero   SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,

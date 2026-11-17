@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($mensaje): ?>
       <div class="alerta <?= $ok ? 'exito' : 'error' ?>"><?= e($mensaje) ?></div>
     <?php endif; ?>
-    <p>Se creará la base de datos <strong>cineplus</strong> con sus 8 tablas, sin datos.
+    <p>Se creará la base de datos <strong>cineplus</strong> con sus 8 tablas y los roles Administrador y Cliente (sin datos de ejemplo).
        Si ya existe, se borrará y se volverá a crear.</p>
     <form method="post">
       <button type="submit">Crear base de datos</button>
