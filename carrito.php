@@ -58,46 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ---------- Leer de la base las películas que están en el carrito ----------
-$carrito = carrito();
-$filas = [];
-$cambios = [];   // avisos de películas que se quitaron o ajustaron
-
-if (count($carrito) > 0) {
-    // Un "?" por cada id del carrito: IN (?, ?, ?)
-    $ids = array_keys($carrito);
-    $marcas = implode(', ', array_fill(0, count($ids), '?'));
-    $consulta = $con->prepare("SELECT p.id_pelicula, p.titulo, p.director, p.anio, p.precio, p.existencia,
-                                      p.imagen, p.estado, f.nombre AS formato
-                               FROM Pelicula p
-                               JOIN Formato f ON f.id_formato = p.id_formato
-                               WHERE p.id_pelicula IN ($marcas)");
-    $consulta->bind_param(str_repeat('i', count($ids)), ...$ids);
-    $consulta->execute();
-    $encontradas = [];
-    foreach ($consulta->get_result()->fetch_all(MYSQLI_ASSOC) as $p) {
-        $encontradas[$p['id_pelicula']] = $p;
-    }
-    $consulta->close();
-
-    foreach ($carrito as $id => $cantidad) {
-        $p = $encontradas[$id] ?? null;
-        if ($p === null || $p['estado'] !== 'Publicado' || $p['existencia'] < 1) {
-            // Ya no se puede comprar: se quita del carrito
-            $cambios[] = ($p['titulo'] ?? 'Una película') . ' ya no está disponible y se quitó de tu carrito.';
-            unset($carrito[$id]);
-            continue;
-        }
-        if ($cantidad > $p['existencia']) {
-            $cambios[] = 'De ' . $p['titulo'] . ' solo quedan ' . $p['existencia'] . ', así que ajustamos la cantidad.';
-            $cantidad = (int) $p['existencia'];
-            $carrito[$id] = $cantidad;
-        }
-        $p['cantidad'] = $cantidad;
-        $p['total'] = $cantidad * $p['precio'];
-        $filas[] = $p;
-    }
-    $_SESSION['carrito'] = $carrito;
-}
+[$filas, $cambios] = leerCarrito($con);
 
 // ---------- Totales ----------
 $articulos = array_sum(array_column($filas, 'cantidad'));
