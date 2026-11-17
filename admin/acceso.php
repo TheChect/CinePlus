@@ -156,7 +156,7 @@ if ($hayAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
     <?php endif; ?>
 
-    <p class="cambio chico"><a href="../index.html">&larr; Volver al sitio</a></p>
+    <p class="cambio chico"><a href="../index.php">&larr; Volver al sitio</a></p>
   </div>
 
   <p class="pie-copy centrado">© 2026 Cine+. Acceso exclusivo para administradores.</p>

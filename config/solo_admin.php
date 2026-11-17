@@ -18,7 +18,7 @@ if ($sesion === null) {
 }
 if ($sesion['rol'] !== 'Administrador') {
     // Un cliente no tiene nada que hacer aquí: de regreso al sitio
-    header('Location: ../index.html');
+    header('Location: ../index.php');
     exit;
 }
 

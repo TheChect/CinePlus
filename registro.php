@@ -77,39 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!DOCTYPE html>
-<!-- Cine+ · Crear cuenta (formulario conectado a la tabla Usuario) -->
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crear cuenta · Cine+</title>
-  <link rel="stylesheet" href="css/estilos.css">
-</head>
-<body>
-
-<!-- Encabezado: es igual en todas las páginas; solo cambia el enlace con class="activo" -->
-<header class="encabezado">
-  <div class="contenedor encabezado-contenido">
-    <a class="logo" href="index.html">
-      <span class="logo-cuadro"></span> CINE+
-    </a>
-
-    <nav class="menu">
-      <a href="index.html">Inicio</a>
-      <a href="tienda.html">Catálogo</a>
-      <a href="acerca.html">Acerca de nosotros</a>
-      <a href="contacto.html">Contacto</a>
-    </nav>
-
-    <div class="menu-cuenta">
-      <a href="login.php">Iniciar sesión</a>
-      <a class="btn btn-primario" href="registro.php">Suscribirse</a>
-    </div>
-  </div>
-</header>
-
-<main>
+<?php
+$titulo = 'Crear cuenta';
+include __DIR__ . '/includes/encabezado.php';
+?>
 
 <!-- Formulario para crear cuenta: se envía por POST a esta misma página -->
 <section class="seccion">
@@ -166,44 +137,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 </section>
 
-</main>
-
-<!-- Pie de página -->
-<footer class="pie">
-  <div class="contenedor pie-columnas">
-    <div class="pie-marca">
-      <a class="logo" href="index.html"><span class="logo-cuadro"></span> CINE+</a>
-      <p class="texto-suave">La tienda de cine físico para coleccionistas exigentes.</p>
-    </div>
-
-    <div>
-      <h4>Navegación</h4>
-      <a href="index.html">Inicio</a>
-      <a href="tienda.html">Catálogo</a>
-      <a href="acerca.html">Acerca de nosotros</a>
-      <a href="contacto.html">Contacto</a>
-    </div>
-
-    <div>
-      <h4>Mi cuenta</h4>
-      <a href="login.php">Iniciar sesión</a>
-      <a href="registro.php">Crear cuenta</a>
-      <a href="carrito.html">Carrito</a>
-      <a href="perfil.html">Mi perfil</a>
-    </div>
-
-    <div>
-      <h4>Soporte</h4>
-      <a href="contacto.html">Preguntas frecuentes</a>
-      <a href="contacto.html">Envíos y entregas</a>
-      <a href="contacto.html">Política de devolución</a>
-    </div>
-  </div>
-
-  <div class="contenedor">
-    <p class="pie-copy">© 2026 Cine+. Proyecto académico FIME · UANL. Todos los derechos reservados.</p>
-  </div>
-</footer>
-
-</body>
-</html>
+<?php include __DIR__ . '/includes/pie.php'; ?>

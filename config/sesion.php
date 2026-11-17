@@ -20,7 +20,7 @@ function usuarioActual(): ?array
 // $prefijo sirve para llamarla desde la raíz ('') o desde la carpeta admin ('../').
 function paginaInicioSegunRol(string $rol, string $prefijo = ''): string
 {
-    return $rol === 'Administrador' ? $prefijo . 'admin/panel.php' : $prefijo . 'index.html';
+    return $rol === 'Administrador' ? $prefijo . 'admin/panel.php' : $prefijo . 'index.php';
 }
 
 /*

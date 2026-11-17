@@ -994,3 +994,9 @@ a:hover {
 .lista-errores ul {
   margin: 0 0 0 18px;
 }
+
+/* Nombre de la persona con sesión iniciada en el menú */
+.menu-usuario {
+  color: var(--texto-suave);
+  font-size: 0.95rem;
+}
