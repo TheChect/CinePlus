@@ -4,6 +4,7 @@
  * - Solo para personas con sesión iniciada (si no, manda a login.php).
  * - Muestra y deja editar nombre, correo, teléfono y país o región de la propia cuenta.
  * - Cambiar contraseña pide la contraseña actual antes de guardar la nueva.
+ * - Muestra el historial de pedidos de la cuenta (del más reciente al más antiguo).
  * - Siempre se usa el id de la sesión: nadie puede editar la cuenta de otra persona.
  */
 require __DIR__ . '/config/conexion.php';
@@ -129,6 +130,29 @@ $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agost
 $t = strtotime($cuenta['fecha_registro']);
 $miembroDesde = $meses[date('n', $t) - 1] . ' de ' . date('Y', $t);
 
+// ---------- Historial de pedidos (solo los de esta cuenta) ----------
+$historial = $con->prepare('SELECT p.id_pedido, p.fecha, p.total, p.estado,
+                                   (SELECT SUM(d.cantidad) FROM Detalle_Pedido d WHERE d.id_pedido = p.id_pedido) AS articulos
+                            FROM Pedido p
+                            WHERE p.id_usuario = ?
+                            ORDER BY p.fecha DESC, p.id_pedido DESC
+                            LIMIT 20');   // los 20 más recientes
+$historial->bind_param('i', $sesion['id']);
+$historial->execute();
+$pedidos = $historial->get_result()->fetch_all(MYSQLI_ASSOC);
+$historial->close();
+
+// Fecha corta: 17 nov 2026
+function fechaPedido(string $fecha): string
+{
+    $meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    $t = strtotime($fecha);
+    return date('j', $t) . ' ' . $meses[date('n', $t) - 1] . ' ' . date('Y', $t);
+}
+
+// Color de la etiqueta según el estado del pedido
+const CLASE_ESTADO = ['Confirmado' => 'azul', 'Enviado' => 'amarilla', 'Entregado' => 'verde', 'Cancelado' => 'roja'];
+
 $titulo = 'Mi perfil';
 include __DIR__ . '/includes/encabezado.php';
 ?>
@@ -215,6 +239,36 @@ include __DIR__ . '/includes/encabezado.php';
     </details>
 
     <p class="cambio chico"><a class="rojo" href="logout.php">Cerrar sesión</a></p>
+  </div>
+
+  <!-- Historial de pedidos -->
+  <div class="caja-ancha tarjeta">
+    <h2>Mis pedidos</h2>
+    <?php if (count($pedidos) === 0): ?>
+      <p class="texto-suave">Todavía no tienes pedidos. <a href="tienda.php">Ir a la tienda</a></p>
+    <?php else: ?>
+      <table class="tabla tabla-pedidos">
+        <thead>
+          <tr><th>Pedido</th><th>Fecha</th><th>Artículos</th><th>Total</th><th>Estado</th><th></th></tr>
+        </thead>
+        <tbody>
+          <?php foreach ($pedidos as $pd): ?>
+            <tr>
+              <td>#<?= $pd['id_pedido'] ?></td>
+              <td><?= fechaPedido($pd['fecha']) ?></td>
+              <td><?= (int) $pd['articulos'] ?></td>
+              <td>$<?= number_format($pd['total'], 2) ?></td>
+              <td><span class="estado-pedido <?= CLASE_ESTADO[$pd['estado']] ?? 'azul' ?>"><?= e($pd['estado']) ?></span></td>
+              <!-- El detalle reutiliza la página de confirmación (solo muestra pedidos propios) -->
+              <td><a href="finalizar.php?pedido=<?= $pd['id_pedido'] ?>">Ver detalle</a></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+      <?php if (count($pedidos) === 20): ?>
+        <p class="texto-suave chico">Se muestran tus 20 pedidos más recientes.</p>
+      <?php endif; ?>
+    <?php endif; ?>
   </div>
 </section>
 

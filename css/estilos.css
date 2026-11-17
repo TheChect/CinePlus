@@ -1140,3 +1140,29 @@ img.mini-poster {
   align-items: center;
   justify-content: center;
 }
+
+/* =========================================================
+   Historial de pedidos (Mi perfil)
+   ========================================================= */
+.caja-ancha {
+  max-width: 820px;
+  margin: 30px auto 0;
+}
+
+.tabla-pedidos {
+  margin-top: 10px;
+}
+
+/* Etiqueta redonda del estado del pedido */
+.estado-pedido {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.estado-pedido.azul     { background-color: var(--azul-banner); color: #93c5fd; }
+.estado-pedido.amarilla { background-color: #3a2a06; color: #fbbf24; }
+.estado-pedido.verde    { background-color: #052e1c; color: #4ade80; }
+.estado-pedido.roja     { background-color: #3b1219; color: #f87171; }
