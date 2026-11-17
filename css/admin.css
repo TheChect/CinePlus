@@ -802,3 +802,36 @@ img.iniciales {
 .acceso-admin .alerta-amarilla {
   margin: 14px 0 0;
 }
+
+/* =========================================================
+   Panel en vivo
+   ========================================================= */
+/* Indicador "En vivo" con un punto verde que parpadea */
+.en-vivo {
+  white-space: nowrap;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.punto-vivo {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  animation: parpadeo 2s infinite;
+}
+
+@keyframes parpadeo {
+  50% { opacity: 0.3; }
+}
+
+/* Colores de las partes de "Ventas por formato" */
+.color-0 { background-color: var(--azul); }
+.color-1 { background-color: var(--azul-claro); }
+.color-2 { background-color: #334155; }
+.color-3 { background-color: #d97706; }
+
+.rojo { color: #ef4444; }

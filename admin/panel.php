@@ -1,14 +1,43 @@
 <?php
 /*
- * Cine+ · Panel administrativo (Dashboard)
- * Por ahora muestra números de ejemplo; solo pueden verlo los administradores.
+ * Cine+ · Panel administrativo (Dashboard) con estadísticas en vivo
+ * - Al cargar, PHP pinta los números reales con calcularEstadisticas() (config/estadisticas.php).
+ * - Después, js/panel.js pide admin/estadisticas.php cada 10 segundos y los actualiza sin recargar.
+ * - Todo se calcula con SELECT sobre las tablas: no hay vistas ni tablas de estadísticas.
+ * Solo pueden verlo los administradores.
  */
 require __DIR__ . '/../config/solo_admin.php';
+require_once __DIR__ . '/../config/estadisticas.php';
+
+$est = calcularEstadisticas(conectar());
+
+// Texto de la variación de ingresos (lo mismo que hace panel.js)
+function textoVariacion(array $est): string
+{
+    if ($est['variacionIngresos'] === null) {
+        return '<span class="texto-suave">Sin ventas en ' . e($est['mesAnterior']) . ' para comparar</span>';
+    }
+    $sube = $est['variacionIngresos'] >= 0;
+    return '<b class="' . ($sube ? 'verde' : 'rojo') . '">' . ($sube ? '+ ' : '− ') . abs($est['variacionIngresos']) . '%</b>'
+        . ' <span class="texto-suave">vs. ' . e($est['mesAnterior']) . '</span>';
+}
+
+function textoDiferenciaPedidos(array $est): string
+{
+    $d = $est['diferenciaPedidos'];
+    if ($d === 0) {
+        return 'Igual que ' . e($est['mesAnterior']);
+    }
+    return ($d > 0 ? '+ ' : '− ') . abs($d) . ($d > 0 ? ' más' : ' menos') . ' que ' . e($est['mesAnterior']);
+}
+
+// 24600 -> "$24.6k" para las etiquetas de las barras
+function cantidadCorta(float $cantidad): string
+{
+    return $cantidad >= 1000 ? '$' . number_format($cantidad / 1000, 1) . 'k' : '$' . round($cantidad);
+}
 ?>
 <!DOCTYPE html>
-<!-- Cine+ · Plantilla del área de administración
-     Barra lateral a la izquierda y contenido a la derecha.
-     Las demás pantallas de admin copian esta misma estructura. -->
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -56,40 +85,36 @@ require __DIR__ . '/../config/solo_admin.php';
     </header>
 
     <main class="admin-contenido">
-      <!-- Título y selector de periodo -->
+      <!-- Título y hora de la última actualización (la cambia js/panel.js) -->
       <div class="admin-titulo">
         <div>
           <h1>Panel administrativo</h1>
-          <p class="texto-suave">Resumen de ventas e inventario · Octubre 2026</p>
+          <p class="texto-suave">Resumen de ventas e inventario · <span id="periodo"><?= e($est['periodo']) ?></span></p>
         </div>
-        <select class="campo periodo">
-          <option>Este mes</option>
-          <option>Mes pasado</option>
-          <option>Este año</option>
-        </select>
+        <span class="en-vivo"><span class="punto-vivo"></span> En vivo · <span id="actualizado">actualizado a las <?= e($est['generado']) ?></span></span>
       </div>
 
-      <!-- Tarjetas con los números principales (datos de ejemplo) -->
+      <!-- Tarjetas con los números principales -->
       <div class="rejilla-4">
         <div class="tarjeta indicador">
           <span class="texto-suave">Ingresos del mes</span>
-          <strong>$24,580</strong>
-          <span class="chico"><b class="verde">+ 12%</b> <span class="texto-suave">vs. septiembre</span></span>
+          <strong id="ingresos-mes">$<?= number_format($est['ingresosMes'], 2) ?></strong>
+          <span class="chico" id="variacion-ingresos"><?= textoVariacion($est) ?></span>
         </div>
         <div class="tarjeta indicador">
           <span class="texto-suave">Pedidos del mes</span>
-          <strong>58</strong>
-          <span class="chico"><b class="verde">+ 8</b> <span class="texto-suave">más que septiembre</span></span>
+          <strong id="pedidos-mes"><?= $est['pedidosMes'] ?></strong>
+          <span class="chico texto-suave" id="diferencia-pedidos"><?= textoDiferenciaPedidos($est) ?></span>
         </div>
         <div class="tarjeta indicador">
           <span class="texto-suave">Clientes registrados</span>
-          <strong>312</strong>
-          <span class="chico"><b class="verde">+18</b> <span class="texto-suave">nuevos este mes</span></span>
+          <strong id="clientes"><?= $est['clientes'] ?></strong>
+          <span class="chico texto-suave" id="clientes-nuevos">+<?= $est['clientesNuevos'] ?> nuevos este mes</span>
         </div>
         <div class="tarjeta indicador">
           <span class="texto-suave">Películas publicadas</span>
-          <strong>126</strong>
-          <span class="texto-suave chico">de 140 registradas</span>
+          <strong id="peliculas-publicadas"><?= $est['peliculasPublicadas'] ?></strong>
+          <span class="texto-suave chico" id="peliculas-registradas">de <?= $est['peliculasRegistradas'] ?> registradas</span>
         </div>
       </div>
 
@@ -101,14 +126,15 @@ require __DIR__ . '/../config/solo_admin.php';
             <h3>Ingresos por mes</h3>
             <span class="texto-suave chico">Últimos 6 meses · MXN</span>
           </div>
-          <!-- Cada barra usa height en % para su altura -->
-          <div class="grafica">
-            <div class="barra-col"><span>$14.2k</span><div class="barra" style="height: 49%;"></div><small>May</small></div>
-            <div class="barra-col"><span>$16.8k</span><div class="barra" style="height: 58%;"></div><small>Jun</small></div>
-            <div class="barra-col"><span>$15.1k</span><div class="barra" style="height: 52%;"></div><small>Jul</small></div>
-            <div class="barra-col"><span>$19.4k</span><div class="barra" style="height: 67%;"></div><small>Ago</small></div>
-            <div class="barra-col"><span>$21.9k</span><div class="barra" style="height: 76%;"></div><small>Sep</small></div>
-            <div class="barra-col"><span>$24.6k</span><div class="barra barra-actual" style="height: 85%;"></div><small>Oct</small></div>
+          <!-- Cada barra usa height en %: el mes más alto ocupa el 85% -->
+          <div class="grafica" id="grafica">
+            <?php foreach ($est['ingresosPorMes'] as $m): ?>
+              <div class="barra-col">
+                <span><?= cantidadCorta($m['ingresos']) ?></span>
+                <div class="barra<?= $m['actual'] ? ' barra-actual' : '' ?>" style="height: <?= $m['altura'] ?>%;"></div>
+                <small><?= $m['mes'] ?></small>
+              </div>
+            <?php endforeach; ?>
           </div>
         </div>
 
@@ -117,18 +143,14 @@ require __DIR__ . '/../config/solo_admin.php';
             <h3>Top 5 películas más vendidas</h3>
             <span class="texto-suave chico">Este mes</span>
           </div>
-          <!-- El ancho del relleno representa las unidades vendidas -->
-          <div class="top">
-            <div class="top-fila"><span>1. Oppenheimer · 4K</span><strong>21 uds.</strong></div>
-            <div class="progreso"><div style="width: 100%;"></div></div>
-            <div class="top-fila"><span>2. Dune: Parte Dos · Blu-ray</span><strong>17 uds.</strong></div>
-            <div class="progreso"><div style="width: 81%;"></div></div>
-            <div class="top-fila"><span>3. El origen · Blu-ray</span><strong>12 uds.</strong></div>
-            <div class="progreso"><div style="width: 57%;"></div></div>
-            <div class="top-fila"><span>4. Batman: El caballero de la noche · 4K</span><strong>9 uds.</strong></div>
-            <div class="progreso"><div style="width: 43%;"></div></div>
-            <div class="top-fila"><span>5. Interestelar · Blu-ray</span><strong>7 uds.</strong></div>
-            <div class="progreso"><div style="width: 33%;"></div></div>
+          <div class="top" id="top-peliculas">
+            <?php if (count($est['topPeliculas']) === 0): ?>
+              <p class="texto-suave">Todavía no hay ventas este mes.</p>
+            <?php endif; ?>
+            <?php foreach ($est['topPeliculas'] as $i => $t): ?>
+              <div class="top-fila"><span><?= $i + 1 ?>. <?= e($t['titulo']) ?> · <?= e($t['formato']) ?></span><strong><?= $t['unidades'] ?> uds.</strong></div>
+              <div class="progreso"><div style="width: <?= $t['ancho'] ?>%;"></div></div>
+            <?php endforeach; ?>
           </div>
         </div>
 
@@ -146,11 +168,18 @@ require __DIR__ . '/../config/solo_admin.php';
             <thead>
               <tr><th>Película</th><th>Formato</th><th>Existencia</th><th>Acción</th></tr>
             </thead>
-            <tbody>
-              <tr><td>Parásitos</td><td>DVD</td><td><span class="insignia roja">Agotada</span></td><td><a href="peliculas.php">Editar</a></td></tr>
-              <tr><td>Dune: Parte Dos</td><td>Blu-ray</td><td><span class="insignia amarilla">3 uds.</span></td><td><a href="peliculas.php">Editar</a></td></tr>
-              <tr><td>El Padrino</td><td>Blu-ray</td><td><span class="insignia amarilla">4 uds.</span></td><td><a href="peliculas.php">Editar</a></td></tr>
-              <tr><td>Pulp Fiction</td><td>DVD</td><td><span class="insignia amarilla">5 uds.</span></td><td><a href="peliculas.php">Editar</a></td></tr>
+            <tbody id="poca-existencia">
+              <?php if (count($est['pocaExistencia']) === 0): ?>
+                <tr><td colspan="4" class="texto-suave">Todas las películas publicadas tienen existencia suficiente.</td></tr>
+              <?php endif; ?>
+              <?php foreach ($est['pocaExistencia'] as $p): ?>
+                <tr>
+                  <td><?= e($p['titulo']) ?></td>
+                  <td><?= e($p['formato']) ?></td>
+                  <td><span class="insignia <?= $p['existencia'] === 0 ? 'roja' : 'amarilla' ?>"><?= $p['existencia'] === 0 ? 'Agotada' : $p['existencia'] . ' uds.' ?></span></td>
+                  <td><a href="pelicula_form.php?id=<?= $p['id_pelicula'] ?>">Editar</a></td>
+                </tr>
+              <?php endforeach; ?>
             </tbody>
           </table>
         </div>
@@ -160,15 +189,20 @@ require __DIR__ . '/../config/solo_admin.php';
             <h3>Ventas por formato</h3>
             <span class="texto-suave chico">% de unidades del mes</span>
           </div>
-          <!-- Una sola barra dividida en tres partes -->
-          <div class="barra-formatos">
-            <div class="f-4k" style="width: 38%;"></div>
-            <div class="claro" style="width: 45%;"></div>
-            <div class="f-dvd" style="width: 17%;"></div>
+          <!-- Una sola barra dividida: cada parte tiene el ancho de su porcentaje -->
+          <div class="barra-formatos" id="barra-formatos">
+            <?php foreach ($est['ventasPorFormato'] as $i => $f): ?>
+              <div class="color-<?= $i % 4 ?>" style="width: <?= $f['porcentaje'] ?>%;"></div>
+            <?php endforeach; ?>
           </div>
-          <div class="leyenda"><span><i class="f-4k"></i> 4K Ultra HD</span><strong>38%</strong></div>
-          <div class="leyenda"><span><i class="claro"></i> Blu-ray</span><strong>45%</strong></div>
-          <div class="leyenda"><span><i class="f-dvd"></i> DVD</span><strong>17%</strong></div>
+          <div id="leyenda-formatos">
+            <?php if (count($est['ventasPorFormato']) === 0): ?>
+              <p class="texto-suave">Todavía no hay ventas este mes.</p>
+            <?php endif; ?>
+            <?php foreach ($est['ventasPorFormato'] as $i => $f): ?>
+              <div class="leyenda"><span><i class="color-<?= $i % 4 ?>"></i> <?= e($f['formato']) ?></span><strong><?= $f['porcentaje'] ?>%</strong></div>
+            <?php endforeach; ?>
+          </div>
         </div>
 
       </div>
@@ -177,5 +211,7 @@ require __DIR__ . '/../config/solo_admin.php';
 
 </div>
 
+<!-- Primer JavaScript del proyecto: actualiza el panel cada 10 segundos -->
+<script src="../js/panel.js"></script>
 </body>
 </html>
