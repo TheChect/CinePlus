@@ -29,6 +29,7 @@
         <a href="registro.php">Crear cuenta</a>
         <a href="carrito.php">Carrito</a>
       <?php else: ?>
+        <a href="perfil.php">Mi perfil</a>
         <a href="carrito.php">Carrito</a>
         <?php if ($usuario['rol'] === 'Administrador'): ?>
           <a href="admin/panel.php">Panel de administración</a>

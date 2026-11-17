@@ -6,7 +6,7 @@
  *   $pagina -> 'inicio', 'tienda', 'acerca' o 'contacto' para marcar el enlace activo del menú
  * El lado derecho del menú cambia según la sesión:
  *   - sin sesión: Iniciar sesión y Suscribirse
- *   - cliente: su nombre y Cerrar sesión
+ *   - cliente: su nombre (enlace a Mi perfil) y Cerrar sesión
  *   - administrador: su nombre, Panel y Cerrar sesión
  */
 require_once __DIR__ . '/../config/conexion.php';   // trae la función e() para escapar texto
@@ -51,7 +51,8 @@ function claseActivo(string $nombre, string $pagina): string
         <a href="login.php">Iniciar sesión</a>
         <a class="btn btn-primario" href="registro.php">Suscribirse</a>
       <?php else: ?>
-        <span class="menu-usuario">Hola, <?= e($usuario['nombre']) ?></span>
+        <!-- El nombre lleva a Mi perfil -->
+        <a class="menu-usuario" href="perfil.php">Hola, <?= e($usuario['nombre']) ?></a>
         <?php if ($usuario['rol'] === 'Administrador'): ?>
           <a class="btn btn-primario" href="admin/panel.php">Panel</a>
         <?php endif; ?>

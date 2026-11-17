@@ -1000,3 +1000,48 @@ a:hover {
   color: var(--texto-suave);
   font-size: 0.95rem;
 }
+
+/* =========================================================
+   Mi perfil
+   ========================================================= */
+.perfil-cabecera {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 16px 0 8px;
+}
+
+/* Foto redonda (o la inicial del nombre si no hay foto) */
+.perfil-foto {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.perfil-sin-foto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--azul-banner);
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+/* Sección "Cambiar contraseña" que se abre y cierra */
+.perfil-seccion {
+  margin-top: 24px;
+  border-top: 1px solid var(--borde);
+  padding-top: 16px;
+}
+
+.perfil-seccion summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.rojo {
+  color: #ef4444;
+}
