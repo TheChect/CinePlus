@@ -1,6 +1,8 @@
 <?php
 /*
- * Cine+ · Añadir usuario (CRUD de usuarios, parte 1: crear)
+ * Cine+ · Formulario de usuarios (crear y editar)
+ * - usuario_form.php        -> cuenta nueva (INSERT).
+ * - usuario_form.php?id=ID  -> editar una cuenta (UPDATE). La contraseña solo cambia si se escribe una nueva.
  * - El rol sale de la tabla Rol.
  * - Valida los datos, revisa que el correo no esté registrado y guarda con INSERT preparado.
  * - La contraseña nunca se guarda tal cual: se guarda cifrada con password_hash().
@@ -33,6 +35,57 @@ $datos = [
 ];
 $errores = [];
 
+// ---------- ¿Cuenta nueva o edición? ----------
+$id = (int) ($_POST['id'] ?? $_GET['id'] ?? 0);
+$editando = $id > 0;
+$fotoActual = null;
+
+if ($editando) {
+    $buscar = $con->prepare('SELECT u.*, r.nombre AS rol FROM Usuario u JOIN Rol r ON r.id_rol = u.id_rol WHERE u.id_usuario = ?');
+    $buscar->bind_param('i', $id);
+    $buscar->execute();
+    $usuario = $buscar->get_result()->fetch_assoc();
+    $buscar->close();
+
+    if ($usuario === null) {
+        header('Location: usuarios.php?noexiste=1');
+        exit;
+    }
+    $fotoActual = $usuario['foto'];
+
+    // Al abrir se llenan los campos con lo guardado (nunca la contraseña)
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        foreach ($datos as $campo => $valor) {
+            $datos[$campo] = (string) ($usuario[$campo] ?? '');
+        }
+    }
+}
+
+// Cuántos administradores activos hay sin contar al usuario $idIgnorar
+function otrosAdminsActivos(mysqli $con, int $idIgnorar): int
+{
+    $consulta = $con->prepare("SELECT COUNT(*) FROM Usuario u JOIN Rol r ON r.id_rol = u.id_rol
+                               WHERE r.nombre = 'Administrador' AND u.estado = 'Activo' AND u.id_usuario <> ?");
+    $consulta->bind_param('i', $idIgnorar);
+    $consulta->execute();
+    $consulta->bind_result($cuantos);
+    $consulta->fetch();
+    $consulta->close();
+    return $cuantos;
+}
+
+// Borra una foto de perfil (solo dentro de img/perfiles/)
+function borrarFoto(?string $ruta): void
+{
+    if ($ruta === null || !str_starts_with($ruta, 'img/perfiles/')) {
+        return;
+    }
+    $archivo = __DIR__ . '/../img/perfiles/' . basename($ruta);
+    if (is_file($archivo)) {
+        unlink($archivo);
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($datos as $campo => $valor) {
         $datos[$campo] = trim($_POST[$campo] ?? '');
@@ -51,8 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] = 'Escribe un correo electrónico válido.';
     } else {
         // El correo no se puede repetir (también lo protege el UNIQUE de la tabla)
-        $buscar = $con->prepare('SELECT COUNT(*) FROM Usuario WHERE correo = ?');
-        $buscar->bind_param('s', $datos['correo']);
+        // Al editar no se cuenta el mismo usuario (id_usuario <> ?)
+        $buscar = $con->prepare('SELECT COUNT(*) FROM Usuario WHERE correo = ? AND id_usuario <> ?');
+        $buscar->bind_param('si', $datos['correo'], $id);
         $buscar->execute();
         $buscar->bind_result($existe);
         $buscar->fetch();
@@ -67,10 +121,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($datos['pais_region'] !== '' && !in_array($datos['pais_region'], PAISES, true)) {
         $errores[] = 'Selecciona un país de la lista.';
     }
-    if (mb_strlen($contrasena) < 8) {
-        $errores[] = 'La contraseña debe tener al menos 8 caracteres.';
-    } elseif ($contrasena !== $confirmar) {
-        $errores[] = 'Las contraseñas no coinciden.';
+    // Al editar, si las dos contraseñas se dejan vacías se conserva la actual
+    $cambiaContrasena = !$editando || $contrasena !== '' || $confirmar !== '';
+    if ($cambiaContrasena) {
+        if (mb_strlen($contrasena) < 8) {
+            $errores[] = 'La contraseña debe tener al menos 8 caracteres.';
+        } elseif ($contrasena !== $confirmar) {
+            $errores[] = 'Las contraseñas no coinciden.';
+        }
     }
     $rolValido = false;
     foreach ($listaRoles as $r) {
@@ -83,6 +141,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if (!in_array($datos['estado'], ['Activo', 'Suspendido'], true)) {
         $errores[] = 'El estado de la cuenta no es válido.';
+    }
+    // Si se edita al último administrador activo, no se le puede quitar el rol ni suspender
+    if ($editando && $usuario['rol'] === 'Administrador' && $usuario['estado'] === 'Activo'
+        && otrosAdminsActivos($con, $id) === 0) {
+        $sigueAdmin = $datos['id_rol'] === (string) $usuario['id_rol'] && $datos['estado'] === 'Activo';
+        if (!$sigueAdmin) {
+            $errores[] = 'Es el único administrador activo: no se le puede cambiar el rol ni suspender.';
+        }
     }
 
     // ---------- Foto de perfil (opcional) ----------
@@ -108,31 +174,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // ---------- Guardar ----------
     if (count($errores) === 0) {
-        $rutaFoto = null;
+        // Al editar, si no se sube foto nueva se conserva la actual
+        $rutaFoto = $fotoActual;
         if ($extension !== null) {
             $rutaFoto = 'img/perfiles/perfil_' . bin2hex(random_bytes(8)) . '.' . $extension;
             if (!move_uploaded_file($foto['tmp_name'], __DIR__ . '/../' . $rutaFoto)) {
                 $errores[] = 'No se pudo guardar la foto en el servidor.';
+                $rutaFoto = $fotoActual;
             }
         }
     }
 
     if (count($errores) === 0) {
         // password_hash cifra la contraseña; para revisarla al iniciar sesión se usa password_verify
-        $hash = password_hash($contrasena, PASSWORD_DEFAULT);
+        $hash = $cambiaContrasena ? password_hash($contrasena, PASSWORD_DEFAULT) : $usuario['contrasena_hash'];
         $idRol = (int) $datos['id_rol'];
         $telefono = $datos['telefono'] === '' ? null : $datos['telefono'];
         $pais = $datos['pais_region'] === '' ? null : $datos['pais_region'];
 
-        $insertar = $con->prepare('INSERT INTO Usuario
-            (id_rol, nombre, correo, contrasena_hash, telefono, pais_region, foto, estado)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-        $insertar->bind_param('isssssss', $idRol, $datos['nombre'], $datos['correo'], $hash,
-            $telefono, $pais, $rutaFoto, $datos['estado']);
+        if ($editando) {
+            $consulta = $con->prepare('UPDATE Usuario SET id_rol = ?, nombre = ?, correo = ?, contrasena_hash = ?,
+                                       telefono = ?, pais_region = ?, foto = ?, estado = ?
+                                       WHERE id_usuario = ?');
+            $consulta->bind_param('isssssssi', $idRol, $datos['nombre'], $datos['correo'], $hash,
+                $telefono, $pais, $rutaFoto, $datos['estado'], $id);
+        } else {
+            $consulta = $con->prepare('INSERT INTO Usuario
+                (id_rol, nombre, correo, contrasena_hash, telefono, pais_region, foto, estado)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+            $consulta->bind_param('isssssss', $idRol, $datos['nombre'], $datos['correo'], $hash,
+                $telefono, $pais, $rutaFoto, $datos['estado']);
+        }
         try {
-            $insertar->execute();
-            $insertar->close();
-            header('Location: usuarios.php?creado=1');
+            $consulta->execute();
+            $consulta->close();
+            // Si se cambió la foto, se borra la anterior
+            if ($editando && $fotoActual !== null && $rutaFoto !== $fotoActual) {
+                borrarFoto($fotoActual);
+            }
+            header('Location: usuarios.php?' . ($editando ? 'editado=1' : 'creado=1'));
             exit;
         } catch (mysqli_sql_exception $ex) {
             // 1062 = valor duplicado: otra persona registró ese correo justo antes
@@ -142,8 +222,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errores[] = 'No se pudo guardar el usuario: ' . $ex->getMessage();
             }
             // Si se había subido una foto, se borra porque el usuario no se guardó
-            if ($rutaFoto !== null && is_file(__DIR__ . '/../' . $rutaFoto)) {
-                unlink(__DIR__ . '/../' . $rutaFoto);
+            if ($rutaFoto !== null && $rutaFoto !== $fotoActual) {
+                borrarFoto($rutaFoto);
             }
         }
     }
@@ -159,7 +239,7 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Añadir usuario · Cine+</title>
+  <title><?= $editando ? 'Editar usuario' : 'Añadir usuario' ?> · Cine+</title>
   <link rel="stylesheet" href="../css/estilos.css">
   <link rel="stylesheet" href="../css/admin.css">
 </head>
@@ -201,15 +281,17 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
     </header>
 
     <main class="admin-contenido">
-      <p class="ruta chico"><a href="usuarios.php">Gestión de Usuarios</a> / <span>Añadir usuario</span></p>
+      <p class="ruta chico"><a href="usuarios.php">Gestión de Usuarios</a> / <span><?= $editando ? 'Editar usuario' : 'Añadir usuario' ?></span></p>
       <div class="admin-titulo">
         <div>
-          <h1>Añadir usuario</h1>
-          <p class="texto-suave">Registra una nueva cuenta desde el área administrativa.</p>
+          <h1><?= $editando ? 'Editar usuario' : 'Añadir usuario' ?></h1>
+          <p class="texto-suave">
+            <?= $editando ? 'Modifica los datos de la cuenta con ID ' . $id . '.' : 'Registra una nueva cuenta desde el área administrativa.' ?>
+          </p>
         </div>
         <div class="modal-botones sin-margen">
           <a class="btn btn-secundario" href="usuarios.php">Cancelar</a>
-          <button class="btn btn-primario" type="submit" form="form-usuario">Crear usuario</button>
+          <button class="btn btn-primario" type="submit" form="form-usuario"><?= $editando ? 'Guardar cambios' : 'Crear usuario' ?></button>
         </div>
       </div>
 
@@ -231,11 +313,18 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
         </div>
       <?php endif; ?>
 
-      <form class="formulario-admin" id="form-usuario" method="post" action="usuario_form.php" enctype="multipart/form-data">
+      <form class="formulario-admin" id="form-usuario" method="post" action="usuario_form.php<?= $editando ? '?id=' . $id : '' ?>" enctype="multipart/form-data">
+        <?php if ($editando): ?>
+          <input type="hidden" name="id" value="<?= $id ?>">
+        <?php endif; ?>
 
         <div class="tarjeta centrado">
           <h3>Foto de perfil</h3>
-          <div class="foto-vacia">Sin foto</div>
+          <?php if ($fotoActual !== null): ?>
+            <img class="foto-actual" src="../<?= e($fotoActual) ?>" alt="Foto actual">
+          <?php else: ?>
+            <div class="foto-vacia">Sin foto</div>
+          <?php endif; ?>
           <p class="texto-suave chico">Opcional. JPG, PNG o WEBP, máx. 1 MB</p>
           <label class="btn btn-secundario btn-bloque">Subir foto
             <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="archivo-oculto">
@@ -275,11 +364,12 @@ function marcado(string $valorActual, $valorOpcion, string $palabra): string
           <div class="dos-campos">
             <div>
               <label for="contrasena">Contraseña *</label>
-              <input class="campo" id="contrasena" name="contrasena" type="password" minlength="8" required placeholder="Mínimo 8 caracteres">
+              <input class="campo" id="contrasena" name="contrasena" type="password" minlength="8" <?= $editando ? '' : 'required' ?>
+                     placeholder="<?= $editando ? 'Déjala vacía para no cambiarla' : 'Mínimo 8 caracteres' ?>">
             </div>
             <div>
               <label for="confirmar">Confirmar contraseña *</label>
-              <input class="campo" id="confirmar" name="confirmar" type="password" minlength="8" required placeholder="Repite la contraseña">
+              <input class="campo" id="confirmar" name="confirmar" type="password" minlength="8" <?= $editando ? '' : 'required' ?> placeholder="Repite la contraseña">
             </div>
           </div>
 

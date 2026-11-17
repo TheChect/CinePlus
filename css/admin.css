@@ -783,3 +783,12 @@ img.mini-poster {
 img.iniciales {
   object-fit: cover;
 }
+
+/* Foto de perfil actual al editar un usuario */
+.foto-actual {
+  width: 140px;
+  height: 140px;
+  margin: 14px auto;
+  border-radius: 50%;
+  object-fit: cover;
+}
