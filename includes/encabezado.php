@@ -11,6 +11,7 @@
  */
 require_once __DIR__ . '/../config/conexion.php';   // trae la función e() para escapar texto
 require_once __DIR__ . '/../config/sesion.php';
+require_once __DIR__ . '/../config/carrito.php';   // para contar los artículos del carrito
 
 $titulo = $titulo ?? 'Cine+';
 $pagina = $pagina ?? '';
@@ -47,6 +48,8 @@ function claseActivo(string $nombre, string $pagina): string
     </nav>
 
     <div class="menu-cuenta">
+      <!-- Carrito con el número de artículos (sale de la sesión) -->
+      <a href="carrito.php">Carrito (<?= articulosEnCarrito() ?>)</a>
       <?php if ($usuario === null): ?>
         <a href="login.php">Iniciar sesión</a>
         <a class="btn btn-primario" href="registro.php">Suscribirse</a>

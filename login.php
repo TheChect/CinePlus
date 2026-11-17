@@ -11,12 +11,14 @@ require __DIR__ . '/config/sesion.php';
 // Si ya tiene sesión, no tiene caso volver a iniciarla
 $actual = usuarioActual();
 if ($actual !== null) {
-    header('Location: ' . paginaInicioSegunRol($actual['rol']));
+    header('Location: ' . (($_GET['volver'] ?? '') === 'carrito' ? 'carrito.php' : paginaInicioSegunRol($actual['rol'])));
     exit;
 }
 
 $correo = '';
 $error = '';
+// Si viene del carrito ("Inicia sesión para pagar"), después de entrar regresa al carrito
+$volverCarrito = ($_GET['volver'] ?? $_POST['volver'] ?? '') === 'carrito';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correo = trim($_POST['correo'] ?? '');
@@ -29,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $usuario = verificarCredenciales($con, $correo, $contrasena, $error);
         if ($usuario !== null) {
             iniciarSesion($con, $usuario);
-            header('Location: ' . paginaInicioSegunRol($usuario['rol']));
+            header('Location: ' . ($volverCarrito ? 'carrito.php' : paginaInicioSegunRol($usuario['rol'])));
             exit;
         }
     }
@@ -51,9 +53,14 @@ include __DIR__ . '/includes/encabezado.php';
     <?php endif; ?>
     <?php if ($error !== ''): ?>
       <p class="alerta-error"><?= e($error) ?></p>
+    <?php elseif ($volverCarrito): ?>
+      <p class="alerta-exito">Inicia sesión para terminar tu compra. Tu carrito se conserva.</p>
     <?php endif; ?>
 
     <form method="post" action="login.php">
+      <?php if ($volverCarrito): ?>
+        <input type="hidden" name="volver" value="carrito">
+      <?php endif; ?>
       <label for="correo">Correo electrónico</label>
       <input class="campo" type="email" id="correo" name="correo" required placeholder="nombre@correo.com" value="<?= e($correo) ?>">
 

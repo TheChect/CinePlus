@@ -1,5 +1,11 @@
 <?php
-// Cine+ · Finalizar compra
+// Cine+ · Finalizar compra (todavía es diseño; se conecta en el siguiente paso)
+// Para pagar hay que tener sesión iniciada
+require_once __DIR__ . '/config/sesion.php';
+if (usuarioActual() === null) {
+    header('Location: login.php?volver=carrito');
+    exit;
+}
 $titulo = 'Finalizar compra';
 $pagina = 'tienda';   // enlace del menú que se marca como activo
 include __DIR__ . '/includes/encabezado.php';
