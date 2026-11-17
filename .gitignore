@@ -1,3 +1,7 @@
 # Portadas subidas desde el panel (son datos, no código)
 img/portadas/*
 !img/portadas/.gitkeep
+
+# Fotos de perfil subidas desde el panel
+img/perfiles/*
+!img/perfiles/.gitkeep

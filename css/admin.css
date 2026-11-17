@@ -778,3 +778,8 @@ img.mini-poster {
   background-color: #3a2a06;
   color: #fbbf24;
 }
+
+/* Foto de perfil real en lugar de las iniciales */
+img.iniciales {
+  object-fit: cover;
+}

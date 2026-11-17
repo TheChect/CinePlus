@@ -208,7 +208,7 @@ function enlacePagina(int $numero): string
     <p class="lateral-titulo">Principal</p>
     <nav class="lateral-menu">
       <a href="panel.html">Dashboard</a>
-      <a href="usuarios.html">Gestión de Usuarios</a>
+      <a href="usuarios.php">Gestión de Usuarios</a>
       <a class="activo" href="peliculas.php">Gestión de Películas</a>
       <a href="generos.php">Gestión de Géneros</a>
       <a href="formatos.php">Gestión de Formatos</a>
